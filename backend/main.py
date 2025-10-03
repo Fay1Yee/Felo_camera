@@ -54,10 +54,10 @@ def get_ark_client() -> OpenAI:
 
 # 模式对应的提示词
 MODE_PROMPTS = {
-    "normal": "Please analyze this image content and describe the main objects and scenes concisely.",
-    "pet": "Please identify the pet type, breed and status in the image, and describe the pet's characteristics and behavior.",
-    "health": "Please analyze this image from a health perspective, identify possible health-related information, and give suggestions.",
-    "travel": "Please analyze this travel scene image, identify locations, landscapes or travel-related elements, and describe them."
+    "normal": "当前为普通模式，专注于提供日常通用问题的专业解答和实用建议。服务范围包括生活常识、实用技巧、基础咨询等领域，确保提供准确、可靠的信息支持。请分析这张图片的内容，描述主要物体和场景。",
+    "pet": "当前为宠物模式，请执行以下专业分析：1. 精确识别宠物品种、显著特征及当前行为状态；2. 详细分析宠物活动类型（包括但不限于睡觉、玩耍、进食、观察等行为）；3. 科学评估宠物能量水平及行为模式特征；4. 提供针对性的行为解读和建议。",
+    "health": "当前为健康模式，请基于用户上传的宠物体检报告或状态照片：1. 进行专业的健康状态评估；2. 识别潜在健康风险并提供预警；3. 生成详细的养护建议报告；4. 必要时推荐进一步检查方案。",
+    "travel": "当前为出行箱模式，请提供全面的宠物出行专业指导：1. 出行前的准备工作清单；2. 运输途中的专业护理方案；3. 目的地适应期的注意事项；4. 突发情况的应急处理建议。请分析图片中的出行相关场景。"
 }
 
 def encode_image_to_base64(image_bytes: bytes) -> str:
@@ -164,7 +164,7 @@ async def analyze_image(
             )
             logger.info("Ark API call successful")
         except Exception as api_error:
-            logger.error(f"Ark API call failed: {api_error}")
+            logger.error(f"Ark API call failed: {str(api_error)}")
             # 返回模拟结果以便测试
             analysis_result = f"This is an image analysis result in {mode} mode. Returning mock data due to API configuration issues."
         
