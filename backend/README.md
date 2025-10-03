@@ -46,7 +46,7 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # 编辑 .env 文件，填入你的 API 密钥
-ARK_API_KEY=your_ark_api_key_here
+ARK_API_KEY=e779c50a-bc8c-4673-ada3-30c4e7987018
 HOST=0.0.0.0
 PORT=8000
 DEBUG=true

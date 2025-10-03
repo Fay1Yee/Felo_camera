@@ -40,3 +40,30 @@
 # Keep path provider classes
 -keep class io.flutter.plugins.pathprovider.** { *; }
 -dontwarn io.flutter.plugins.pathprovider.**
+
+# Keep flutter_gemma classes and native methods
+-keep class dev.flutter.plugins.flutter_gemma.** { *; }
+-dontwarn dev.flutter.plugins.flutter_gemma.**
+
+# Keep Google AI classes for Gemma
+-keep class com.google.ai.** { *; }
+-dontwarn com.google.ai.**
+
+# Keep MediaPipe classes
+-keep class com.google.mediapipe.** { *; }
+-dontwarn com.google.mediapipe.**
+
+# Keep AutoValue classes (used by flutter_gemma)
+-keep class com.google.auto.value.** { *; }
+-dontwarn com.google.auto.value.**
+
+# Disable obfuscation for reflection-based code
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes InnerClasses
+-keepattributes EnclosingMethod
+
+# Keep native methods
+-keepclasseswithmembernames class * {
+    native <methods>;
+}

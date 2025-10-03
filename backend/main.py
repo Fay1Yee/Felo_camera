@@ -16,6 +16,10 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from openai import OpenAI
 from PIL import Image
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -41,19 +45,19 @@ def get_ark_client() -> OpenAI:
     """获取配置好的 Ark 客户端"""
     api_key = os.getenv("ARK_API_KEY")
     if not api_key:
-        raise ValueError("ARK_API_KEY 环境变量未设置")
+        raise ValueError("ARK_API_KEY environment variable not set")
     
     return OpenAI(
         api_key=api_key,
         base_url="https://ark.cn-beijing.volces.com/api/v3"
     )
 
-# 模式对应的中文提示词
+# 模式对应的提示词
 MODE_PROMPTS = {
-    "normal": "请分析这张图片的内容，用简洁的中文描述主要物体和场景。",
-    "pet": "请识别图片中的宠物类型、品种和状态，用中文描述宠物的特征和行为。",
-    "health": "请从健康角度分析这张图片，识别可能的健康相关信息，用中文给出建议。",
-    "travel": "请分析这张旅行场景图片，识别地点、景观或旅行相关元素，用中文描述。"
+    "normal": "Please analyze this image content and describe the main objects and scenes concisely.",
+    "pet": "Please identify the pet type, breed and status in the image, and describe the pet's characteristics and behavior.",
+    "health": "Please analyze this image from a health perspective, identify possible health-related information, and give suggestions.",
+    "travel": "Please analyze this travel scene image, identify locations, landscapes or travel-related elements, and describe them."
 }
 
 def encode_image_to_base64(image_bytes: bytes) -> str:
@@ -98,21 +102,34 @@ async def analyze_image(
         JSON 响应包含分析结果
     """
     try:
+        # 添加详细日志
+        logger.info(f"Received request - file: {file.filename}, content_type: {file.content_type}, mode: {mode}")
+        
         # 验证文件类型
         if not file.content_type or not file.content_type.startswith('image/'):
+            logger.error(f"Invalid content type: {file.content_type}")
             raise HTTPException(status_code=400, detail="请上传有效的图片文件")
         
         # 验证模式
         if mode not in MODE_PROMPTS:
+            logger.warning(f"Invalid mode '{mode}', using 'normal'")
             mode = "normal"
         
         # 读取图片数据
         image_bytes = await file.read()
+        logger.info(f"Image size: {len(image_bytes)} bytes")
+        
         if len(image_bytes) == 0:
+            logger.error("Empty image file")
             raise HTTPException(status_code=400, detail="图片文件为空")
         
         # 编码图片
-        base64_image = encode_image_to_base64(image_bytes)
+        try:
+            base64_image = encode_image_to_base64(image_bytes)
+            logger.info("Image encoded successfully")
+        except Exception as e:
+            logger.error(f"Image encoding failed: {e}")
+            raise HTTPException(status_code=400, detail=f"图片编码失败: {str(e)}")
         
         # 获取 Ark 客户端
         client = get_ark_client()
@@ -137,7 +154,7 @@ async def analyze_image(
         ]
         
         # 调用 Ark API
-        logger.info(f"正在分析图片 - 模式: {mode}")
+        logger.info(f"Analyzing image - mode: {mode}")
         try:
             response = client.chat.completions.create(
                 model="doubao-seed-1-6-250615",  # 使用用户提供的推理接入点 ID
@@ -145,10 +162,11 @@ async def analyze_image(
                 max_tokens=300,
                 temperature=0.7
             )
+            logger.info("Ark API call successful")
         except Exception as api_error:
-            logger.error(f"Ark API 调用失败: {api_error}")
+            logger.error(f"Ark API call failed: {api_error}")
             # 返回模拟结果以便测试
-            analysis_result = f"这是一张{mode}模式下的图片分析结果。由于API配置问题，当前返回模拟数据。"
+            analysis_result = f"This is an image analysis result in {mode} mode. Returning mock data due to API configuration issues."
         
         # 解析响应
         try:
@@ -156,8 +174,8 @@ async def analyze_image(
                 analysis_result = response.choices[0].message.content.strip()
             # 如果没有response（API调用失败），使用之前设置的模拟结果
         except Exception as e:
-            logger.error(f"解析响应失败: {e}")
-            analysis_result = f"这是一张{mode}模式下的图片分析结果。解析响应时出现问题，返回模拟数据。"
+            logger.error(f"Response parsing failed: {e}")
+            analysis_result = f"This is an image analysis result in {mode} mode. Response parsing error, returning mock data."
         
         # 构建符合 Flutter 客户端期望的响应格式
         result = {
@@ -172,7 +190,7 @@ async def analyze_image(
             "timestamp": int(os.times().elapsed * 1000)  # 毫秒时间戳
         }
         
-        logger.info(f"分析完成 - 模式: {mode}")
+        logger.info(f"Analysis completed - mode: {mode}")
         return JSONResponse(content=result)
             
     except HTTPException:
@@ -184,22 +202,22 @@ async def analyze_image(
 def get_title_for_mode(mode: str) -> str:
     """根据模式获取标题"""
     titles = {
-        "normal": "场景识别",
-        "pet": "宠物识别", 
-        "health": "健康分析",
-        "travel": "旅行助手"
+        "normal": "Scene Recognition",
+        "pet": "Pet Recognition", 
+        "health": "Health Analysis",
+        "travel": "Travel Assistant"
     }
-    return titles.get(mode, "智能分析")
+    return titles.get(mode, "Smart Analysis")
 
 def get_sub_info_for_mode(mode: str) -> str:
     """根据模式获取副标题信息"""
     sub_infos = {
-        "normal": "AI 视觉分析",
-        "pet": "宠物行为识别",
-        "health": "健康状态评估", 
-        "travel": "出行箱视角"
+        "normal": "AI Vision Analysis",
+        "pet": "Pet Behavior Recognition",
+        "health": "Health Status Assessment", 
+        "travel": "Travel Perspective"
     }
-    return sub_infos.get(mode, "智能识别")
+    return sub_infos.get(mode, "Smart Recognition")
 
 @app.get("/health")
 async def health_check():
@@ -226,16 +244,18 @@ async def health_check():
         )
 
 if __name__ == "__main__":
-    # 检查必要的环境变量
+    # 检查必需的环境变量
     if not os.getenv("ARK_API_KEY"):
         logger.error("请设置 ARK_API_KEY 环境变量")
         exit(1)
     
-    # 启动服务器
+    logger.info("启动 Nothing Phone 3a Camera API 服务器...")
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8443,
         reload=True,
-        log_level="info"
+        log_level="info",
+        ssl_keyfile="key.pem",
+        ssl_certfile="cert.pem"
     )

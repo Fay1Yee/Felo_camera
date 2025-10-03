@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <!-- 摄像头权限描述 -->
+    <key>NSCameraUsageDescription</key>
+    <string>需要使用摄像头进行拍照并发送到AI进行分析。</string>
+    <!-- 临时允许HTTP明文以便开发联调；请在生产关闭或配置HTTPS -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>

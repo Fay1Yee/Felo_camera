@@ -4,6 +4,9 @@
 *.pem
 *.p12
 
+# Flutter 框架目录（避免嵌套仓库）
+flutter/
+
 # Python
 __pycache__/
 *.py[cod]
