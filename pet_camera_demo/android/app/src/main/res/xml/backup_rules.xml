@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   备份规则配置文件
+   保护应用数据不被系统自动删除，仅允许用户手动删除
+   参考: https://developer.android.com/guide/topics/data/autobackup
+-->
+<full-backup-content>
+    <!-- 包含应用的共享首选项 -->
+    <include domain="sharedpref" path="."/>
+    
+    <!-- 包含应用的内部存储文件 -->
+    <include domain="file" path="."/>
+    
+    <!-- 包含应用的数据库文件 -->
+    <include domain="database" path="."/>
+    
+    <!-- 排除临时文件和缓存 -->
+    <exclude domain="file" path="cache"/>
+    <exclude domain="file" path="temp"/>
+    
+    <!-- 保护历史分析记录文件 -->
+    <include domain="file" path="analysis_history.json"/>
+    
+    <!-- 保护图片文件夹 -->
+    <include domain="file" path="images"/>
+</full-backup-content>

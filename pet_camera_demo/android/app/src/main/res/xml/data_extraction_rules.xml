@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   数据提取规则配置文件 (Android 12+)
+   控制云备份和设备传输时的数据保护
+   参考: https://developer.android.com/about/versions/12/backup-restore#xml-changes
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- 包含应用的共享首选项 -->
+        <include domain="sharedpref" path="."/>
+        
+        <!-- 包含应用的内部存储文件 -->
+        <include domain="file" path="."/>
+        
+        <!-- 包含应用的数据库文件 -->
+        <include domain="database" path="."/>
+        
+        <!-- 排除敏感数据和临时文件 -->
+        <exclude domain="file" path="cache"/>
+        <exclude domain="file" path="temp"/>
+        
+        <!-- 保护历史分析记录 -->
+        <include domain="file" path="analysis_history.json"/>
+        
+        <!-- 保护用户图片数据 -->
+        <include domain="file" path="images"/>
+    </cloud-backup>
+    
+    <device-transfer>
+        <!-- 设备传输时也保护相同的数据 -->
+        <include domain="sharedpref" path="."/>
+        <include domain="file" path="."/>
+        <include domain="database" path="."/>
+        
+        <!-- 排除临时文件 -->
+        <exclude domain="file" path="cache"/>
+        <exclude domain="file" path="temp"/>
+        
+        <!-- 确保历史记录在设备传输时被保护 -->
+        <include domain="file" path="analysis_history.json"/>
+        <include domain="file" path="images"/>
+    </device-transfer>
+</data-extraction-rules>

@@ -49,6 +49,44 @@
 -keep class com.google.ai.** { *; }
 -dontwarn com.google.ai.**
 
+# Nothing Phone 3a 特定优化
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+-optimizationpasses 5
+-allowaccessmodification
+-dontpreverify
+
+# 保持应用性能管理器类
+-keep class com.smartcamera.pet_assistant.** { *; }
+
+# 保持图像处理相关类
+-keep class * extends android.graphics.drawable.Drawable { *; }
+-keep class * implements java.io.Serializable { *; }
+
+# 保持网络请求相关类
+-keepclassmembers class * {
+    @retrofit2.http.* <methods>;
+}
+-keep class retrofit2.** { *; }
+-dontwarn retrofit2.**
+
+# 保持JSON序列化类
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# 移动端性能优化
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+
 # Keep MediaPipe classes
 -keep class com.google.mediapipe.** { *; }
 -dontwarn com.google.mediapipe.**

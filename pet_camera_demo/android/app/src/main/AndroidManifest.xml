@@ -1,21 +1,31 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 摄像头权限 -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <!-- 网络权限已移除 - 应用完全离线运行 -->
-    <!-- 存储权限 -->
+    
+    <!-- 存储权限 - 适配Android 13+ -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     
+    <!-- 网络权限 - 用于AI分析API调用 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- 唤醒锁权限 - 防止处理过程中休眠 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
     <!-- 声明摄像头功能 -->
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.back" android:required="false" />
     
     <application
-        android:label="Pet Camera AI"
+        android:label="智能相机助手"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
-        <!-- 移除网络安全配置 - 完全离线应用 -->
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,7 +35,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
