@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Nothing Phone 3a Camera - AI 智能相机应用
+=======
+# Felo-camera - AI 智能相机应用
+>>>>>>> 3b0e88d254f058ce84803d251720f743bd0a133e
 
 🚀 基于 Flutter + FastAPI + 火山引擎 Ark 的智能相机应用，专为 Nothing Phone 3a 设计
 
