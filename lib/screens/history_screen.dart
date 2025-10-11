@@ -1,15 +1,18 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/analysis_history.dart';
 import '../services/history_manager.dart';
+import '../services/history_notifier.dart';
 import '../config/nothing_theme.dart';
 import '../config/device_config.dart';
 import '../widgets/nothing_timeline.dart';
 import '../widgets/nothing_photo_album.dart';
 import '../widgets/nothing_statistics.dart';
 import '../widgets/behavior_analytics_widget.dart';
+
 // 已移除宠物语气助手，统一采用简洁、专业且亲和的文本风格
 
 class HistoryScreen extends StatefulWidget {
@@ -24,18 +27,62 @@ class _HistoryScreenState extends State<HistoryScreen>
   late TabController _tabController;
   List<AnalysisHistory> _histories = [];
   bool _isLoading = true;
+  StreamSubscription<HistoryEvent>? _historySubscription;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
     _loadHistories();
+    _setupHistoryListener();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _historySubscription?.cancel();
     super.dispose();
+  }
+
+  /// 设置历史记录变化监听器
+  void _setupHistoryListener() {
+    _historySubscription = HistoryNotifier.instance.historyStream.listen((event) {
+      if (mounted) {
+        switch (event.type) {
+          case HistoryEventType.added:
+            if (event.history != null) {
+              setState(() {
+                // 确保新记录在最前面
+                _histories.removeWhere((h) => h.id == event.history!.id);
+                _histories.insert(0, event.history!);
+              });
+            }
+            break;
+          case HistoryEventType.deleted:
+            if (event.historyId != null) {
+              setState(() {
+                _histories.removeWhere((h) => h.id == event.historyId);
+              });
+            }
+            break;
+          case HistoryEventType.cleared:
+            setState(() {
+              _histories.clear();
+            });
+            break;
+          case HistoryEventType.updated:
+            if (event.history != null) {
+              setState(() {
+                final index = _histories.indexWhere((h) => h.id == event.history!.id);
+                if (index != -1) {
+                  _histories[index] = event.history!;
+                }
+              });
+            }
+            break;
+        }
+      }
+    });
   }
 
   Future<void> _loadHistories() async {
@@ -109,7 +156,11 @@ class _HistoryScreenState extends State<HistoryScreen>
             maxWidth: DeviceConfig.isTablet(context) ? 600 : double.infinity,
             maxHeight: MediaQuery.of(context).size.height * 0.85,
           ),
-          decoration: NothingTheme.nothingCardDecoration,
+          decoration: BoxDecoration(
+          color: NothingTheme.surface,
+          borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+          border: Border.all(color: NothingTheme.gray200, width: 1),
+        ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -132,87 +183,22 @@ class _HistoryScreenState extends State<HistoryScreen>
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: NothingTheme.nothingBlack.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
-                      ),
-                      child: Icon(
-                        _getModeIcon(history.mode),
-                        color: NothingTheme.nothingBlack,
-                        size: 24,
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          await _deleteHistory(history);
+                        },
+                        icon: Icon(Icons.delete_outline),
+                        label: Text('删除记录'),
                       ),
                     ),
                     const SizedBox(width: NothingTheme.spacingMedium),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            history.result.title, // 使用专业、亲和且自然的原始风格
-                            style: const TextStyle(
-                              fontSize: NothingTheme.fontSizeHeadline,
-                              fontWeight: NothingTheme.fontWeightBold,
-                              color: NothingTheme.nothingBlack,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: history.isRealtimeAnalysis 
-                                      ? NothingTheme.successGreen.withValues(alpha: 0.2)
-                                      : NothingTheme.infoBlue.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
-                                ),
-                                child: Text(
-                                  history.isRealtimeAnalysis ? '实时分析' : '手动拍照',
-                                  style: TextStyle(
-                                    fontSize: NothingTheme.fontSizeCaption,
-                                    fontWeight: NothingTheme.fontWeightMedium,
-                                    color: history.isRealtimeAnalysis 
-                                        ? NothingTheme.successGreen
-                                        : NothingTheme.infoBlue,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: NothingTheme.nothingBlack.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
-                                ),
-                                child: Text(
-                                  '置信度：${history.result.confidence}%', // 清晰专业表达
-                                  style: const TextStyle(
-                                    fontSize: NothingTheme.fontSizeCaption,
-                                    fontWeight: NothingTheme.fontWeightBold,
-                                    color: NothingTheme.nothingBlack,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
-                        Icons.close,
-                        color: NothingTheme.nothingBlack,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.check),
+                        label: Text('确定'),
                       ),
                     ),
                   ],
@@ -358,7 +344,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                             Text(
                               '分析结果',
                               style: TextStyle(
-                                fontSize: NothingTheme.fontSizeSubtitle,
+                                fontSize: NothingTheme.fontSizeSubheading,
                                 fontWeight: NothingTheme.fontWeightBold,
                                 color: NothingTheme.nothingBlack,
                               ),
@@ -482,7 +468,7 @@ class _HistoryScreenState extends State<HistoryScreen>
             Text(
               title,
               style: TextStyle(
-                fontSize: NothingTheme.fontSizeSubtitle,
+                fontSize: NothingTheme.fontSizeSubheading,
                 fontWeight: NothingTheme.fontWeightBold,
                 color: NothingTheme.nothingBlack,
               ),
@@ -529,7 +515,7 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   Future<void> _deleteHistory(AnalysisHistory history) async {
     await HistoryManager.instance.deleteHistory(history.id);
-    _loadHistories();
+    // 不需要手动调用 _loadHistories()，因为监听器会自动更新界面
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('历史记录已删除')),
@@ -540,9 +526,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   Future<void> _deleteAllHistories() async {
     try {
       await HistoryManager.instance.clearAllHistories();
-      setState(() {
-        _histories.clear();
-      });
+      // 不需要手动更新状态，监听器会自动处理
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -644,21 +628,6 @@ class _HistoryScreenState extends State<HistoryScreen>
     );
   }
 
-  IconData _getModeIcon(String mode) {
-    switch (mode) {
-      case 'normal':
-        return Icons.camera_alt;
-      case 'pet':
-        return Icons.pets;
-      case 'health':
-        return Icons.health_and_safety;
-      case 'travel':
-        return Icons.luggage;
-      default:
-        return Icons.analytics;
-    }
-  }
-
   String _getModeName(String mode) {
     switch (mode) {
       case 'normal':
@@ -688,7 +657,7 @@ class _HistoryScreenState extends State<HistoryScreen>
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: NothingTheme.nothingYellow.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                 border: Border.all(
                   color: NothingTheme.nothingYellow.withValues(alpha: 0.3),
                   width: 1,
@@ -718,7 +687,7 @@ class _HistoryScreenState extends State<HistoryScreen>
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
               color: NothingTheme.nothingWhite,
-              borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+              borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
               border: Border.all(
                 color: NothingTheme.nothingLightGray,
                 width: 1,
@@ -740,7 +709,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: NothingTheme.successGreen.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                                borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                                 border: Border.all(
                                   color: NothingTheme.successGreen.withValues(alpha: 0.3),
                                   width: 1,
@@ -787,7 +756,7 @@ class _HistoryScreenState extends State<HistoryScreen>
               color: _histories.isEmpty 
                   ? NothingTheme.nothingLightGray.withValues(alpha: 0.3)
                   : NothingTheme.nothingDarkGray.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+              borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
               border: Border.all(
                 color: _histories.isEmpty 
                     ? NothingTheme.nothingLightGray
@@ -1011,7 +980,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                 '出行分析',
                 style: const TextStyle(
                   fontSize: NothingTheme.fontSizeBody,
-                  color: NothingTheme.nothingGray,
+                  color: NothingTheme.textSecondary,
                 ),
               ),
             ),
@@ -1022,7 +991,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                 style: TextStyle(
                   fontSize: NothingTheme.fontSizeBody,
                   fontWeight: NothingTheme.fontWeightMedium,
-                  color: NothingTheme.nothingBlack,
+                  color: NothingTheme.textSecondary,
                 ),
               ),
             ),
@@ -1051,7 +1020,7 @@ class _HistoryScreenState extends State<HistoryScreen>
         badgeText = '安全风险低';
         break;
       case 'HIGH':
-        badgeColor = NothingTheme.errorRed;
+        badgeColor = NothingTheme.error;
         badgeText = '安全风险高';
         break;
       default:
@@ -1072,7 +1041,7 @@ class _HistoryScreenState extends State<HistoryScreen>
               ),
               decoration: BoxDecoration(
                 color: badgeColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1095,7 +1064,7 @@ class _HistoryScreenState extends State<HistoryScreen>
               weather,
               style: const TextStyle(
                 fontSize: NothingTheme.fontSizeCaption,
-                color: NothingTheme.nothingGray,
+                color: NothingTheme.textSecondary,
               ),
             ),
           ],
@@ -1103,14 +1072,14 @@ class _HistoryScreenState extends State<HistoryScreen>
         const SizedBox(height: NothingTheme.spacingSmall),
         Row(
           children: [
-            Icon(Icons.place_outlined, size: 16, color: NothingTheme.nothingGray),
+            Icon(Icons.place_outlined, size: 16, color: NothingTheme.textSecondary),
             const SizedBox(width: NothingTheme.spacingXSmall),
             Expanded(
               child: Text(
                 '$sceneType · $location',
                 style: const TextStyle(
                   fontSize: NothingTheme.fontSizeBody,
-                  color: NothingTheme.nothingBlack,
+                  color: NothingTheme.textSecondary,
                 ),
               ),
             ),
@@ -1204,14 +1173,14 @@ class _HistoryScreenState extends State<HistoryScreen>
   Widget _sectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: NothingTheme.nothingGray),
+        Icon(icon, size: 16, color: NothingTheme.textSecondary),
         const SizedBox(width: NothingTheme.spacingXSmall),
         Text(
           title,
           style: const TextStyle(
             fontSize: NothingTheme.fontSizeCaption,
             fontWeight: NothingTheme.fontWeightMedium,
-            color: NothingTheme.nothingBlack,
+            color: NothingTheme.textSecondary,
           ),
         ),
       ],
@@ -1226,13 +1195,13 @@ class _HistoryScreenState extends State<HistoryScreen>
       ),
       decoration: BoxDecoration(
         color: NothingTheme.nothingLightGray.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+        borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
       ),
       child: Text(
         text,
         style: const TextStyle(
           fontSize: NothingTheme.fontSizeCaption,
-          color: NothingTheme.nothingBlack,
+          color: NothingTheme.textSecondary,
         ),
       ),
     );

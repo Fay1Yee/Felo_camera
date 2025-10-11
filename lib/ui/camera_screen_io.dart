@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../config/device_config.dart';
@@ -36,7 +35,9 @@ import '../widgets/performance_stats_widget.dart';
 import '../services/preloader.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+  final Mode? initialMode;
+  
+  const CameraScreen({super.key, this.initialMode});
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -74,6 +75,12 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    // 设置初始模式
+    if (widget.initialMode != null) {
+      _mode = widget.initialMode!;
+    }
+    
     _initializeCamera();
     _initializePerformanceManager();
     
@@ -386,6 +393,46 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                                       ),
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 返回按钮 - 添加在左上角
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 16,
+                left: 16,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: NothingTheme.blackAlpha70,
+                    border: Border.all(
+                      color: NothingTheme.grayAlpha30,
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: NothingTheme.blackAlpha20,
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: NothingTheme.nothingWhite,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -868,15 +915,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   }
 
   // 保存到历史记录（保留原方法以兼容其他调用）
-  Future<void> _saveToHistory(File imageFile, bool isRealtime) async {
-    try {
-      if (_result != null) {
-        await _saveToHistoryWithThreshold(imageFile, isRealtime, _result!);
-      }
-    } catch (e) {
-      debugPrint('保存历史记录失败: $e');
-    }
-  }
+  // 移除未使用的_saveToHistory方法
 
   // 添加摄像头切换方法
   Future<void> _switchCamera() async {
@@ -884,7 +923,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       return; // Web模式或只有一个摄像头时不切换
     }
 
-    // 移除 _isInitialized 赋值
+    print('🔄 开始切换摄像头...');
 
     try {
       // 释放当前控制器
@@ -894,12 +933,22 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       _currentCameraIndex = (_currentCameraIndex + 1) % _cameras!.length;
       final selectedCamera = _cameras![_currentCameraIndex];
       
+      print('📷 切换到摄像头: ${selectedCamera.name}');
+      
       // 初始化新的控制器
       _controller = CameraController(selectedCamera, ResolutionPreset.medium, enableAudio: false);
       await _controller!.initialize();
       
-      // 相机切换完成
+      // 更新UI状态
+      if (mounted) {
+        setState(() {
+          // 触发UI重建以显示新的相机预览
+        });
+      }
+      
+      print('✅ 摄像头切换完成');
     } catch (e) {
+      print('❌ 摄像头切换失败: $e');
       _showError('摄像头切换失败: $e');
     }
   }

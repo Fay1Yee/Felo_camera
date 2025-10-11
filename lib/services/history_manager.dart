@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/analysis_history.dart';
 import '../models/ai_result.dart';
+import 'history_notifier.dart';
 
 /// 分析历史管理服务
 class HistoryManager {
@@ -37,6 +38,9 @@ class HistoryManager {
         // 创建空的历史记录文件
         await _saveHistories();
       }
+      
+      // 初始化通知器
+      HistoryNotifier.instance.updateHistories(_histories);
       
       _initialized = true;
       debugPrint('✅ 历史记录管理器初始化完成，已加载 ${_histories.length} 条记录');
@@ -102,6 +106,9 @@ class HistoryManager {
     
     await _saveHistories();
     
+    // 通知添加新记录
+    HistoryNotifier.instance.notifyHistoryAdded(history);
+    
     debugPrint('📝 添加分析历史记录: ${result.title} ($savedMode模式)');
   }
   
@@ -160,6 +167,10 @@ class HistoryManager {
     
     _histories.removeWhere((h) => h.id == id);
     await _saveHistories();
+    
+    // 通知删除记录
+    HistoryNotifier.instance.notifyHistoryDeleted(id);
+    
     debugPrint('🗑️ 删除历史记录: $id');
   }
   
@@ -182,6 +193,10 @@ class HistoryManager {
     
     _histories.clear();
     await _saveHistories();
+    
+    // 通知清空所有记录
+    HistoryNotifier.instance.notifyHistoriesCleared();
+    
     debugPrint('🗑️ 清空所有历史记录');
   }
   

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../config/nothing_theme.dart';
 import '../models/analysis_history.dart';
+import '../services/history_notifier.dart';
 import 'nothing_chart.dart';
 
 /// Nothing OS风格的统计分析组件
@@ -18,6 +20,8 @@ class NothingStatistics extends StatefulWidget {
 
 class _NothingStatisticsState extends State<NothingStatistics> {
   String _selectedPeriod = '7d';
+  List<AnalysisHistory> _currentHistories = [];
+  StreamSubscription<HistoryEvent>? _historySubscription;
   
   final List<PeriodFilter> _periods = [
     PeriodFilter('7d', '7天'),
@@ -25,6 +29,61 @@ class _NothingStatisticsState extends State<NothingStatistics> {
     PeriodFilter('90d', '90天'),
     PeriodFilter('all', '全部'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentHistories = List.from(widget.histories);
+    _setupHistoryListener();
+  }
+
+  @override
+  void dispose() {
+    _historySubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(NothingStatistics oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.histories != oldWidget.histories) {
+      _currentHistories = List.from(widget.histories);
+    }
+  }
+
+  /// 设置历史记录变化监听器
+  void _setupHistoryListener() {
+    _historySubscription = HistoryNotifier.instance.historyStream.listen((event) {
+      if (mounted) {
+        setState(() {
+          switch (event.type) {
+            case HistoryEventType.added:
+              if (event.history != null) {
+                _currentHistories.removeWhere((h) => h.id == event.history!.id);
+                _currentHistories.insert(0, event.history!);
+              }
+              break;
+            case HistoryEventType.deleted:
+              if (event.historyId != null) {
+                _currentHistories.removeWhere((h) => h.id == event.historyId);
+              }
+              break;
+            case HistoryEventType.cleared:
+              _currentHistories.clear();
+              break;
+            case HistoryEventType.updated:
+              if (event.history != null) {
+                final index = _currentHistories.indexWhere((h) => h.id == event.history!.id);
+                if (index != -1) {
+                  _currentHistories[index] = event.history!;
+                }
+              }
+              break;
+          }
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +173,11 @@ class _NothingStatisticsState extends State<NothingStatistics> {
 
   Widget _buildOverviewCard(StatisticsData stats) {
     return Container(
-      decoration: NothingTheme.nothingCardDecoration,
+      decoration: BoxDecoration(
+        color: NothingTheme.surface,
+        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        border: Border.all(color: NothingTheme.gray200, width: 1),
+      ),
       padding: const EdgeInsets.all(NothingTheme.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +292,11 @@ class _NothingStatisticsState extends State<NothingStatistics> {
 
   Widget _buildShootingHabitsSection(StatisticsData stats) {
     return Container(
-      decoration: NothingTheme.nothingCardDecoration,
+      decoration: BoxDecoration(
+        color: NothingTheme.surface,
+        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        border: Border.all(color: NothingTheme.gray200, width: 1),
+      ),
       padding: const EdgeInsets.all(NothingTheme.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +353,11 @@ class _NothingStatisticsState extends State<NothingStatistics> {
     }
     
     return Container(
-      decoration: NothingTheme.nothingCardDecoration,
+      decoration: BoxDecoration(
+        color: NothingTheme.surface,
+        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        border: Border.all(color: NothingTheme.gray200, width: 1),
+      ),
       padding: const EdgeInsets.all(NothingTheme.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +404,11 @@ class _NothingStatisticsState extends State<NothingStatistics> {
 
   Widget _buildEnvironmentSection(StatisticsData stats) {
     return Container(
-      decoration: NothingTheme.nothingCardDecoration,
+      decoration: BoxDecoration(
+        color: NothingTheme.surface,
+        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        border: Border.all(color: NothingTheme.gray200, width: 1),
+      ),
       padding: const EdgeInsets.all(NothingTheme.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -392,7 +467,11 @@ class _NothingStatisticsState extends State<NothingStatistics> {
 
   Widget _buildModeUsageSection(StatisticsData stats) {
     return Container(
-      decoration: NothingTheme.nothingCardDecoration,
+      decoration: BoxDecoration(
+        color: NothingTheme.surface,
+        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        border: Border.all(color: NothingTheme.gray200, width: 1),
+      ),
       padding: const EdgeInsets.all(NothingTheme.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,14 +660,14 @@ class _NothingStatisticsState extends State<NothingStatistics> {
 
   List<AnalysisHistory> _getFilteredHistories() {
     if (_selectedPeriod == 'all') {
-      return widget.histories;
+      return _currentHistories;
     }
     
     final now = DateTime.now();
     final days = int.parse(_selectedPeriod.replaceAll('d', ''));
     final cutoffDate = now.subtract(Duration(days: days));
     
-    return widget.histories.where((history) => 
+    return _currentHistories.where((history) => 
       history.timestamp.isAfter(cutoffDate)
     ).toList();
   }

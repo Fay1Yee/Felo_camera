@@ -17,7 +17,9 @@ import 'bottom_bar.dart';
 import 'overlay/travel_box_painter.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+  final Mode? initialMode;
+  
+  const CameraScreen({super.key, this.initialMode});
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -31,6 +33,16 @@ class _CameraScreenState extends State<CameraScreen> {
   AIResult? _result;
 
   final _apiClient = ApiClient.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // 设置初始模式
+    if (widget.initialMode != null) {
+      _mode = widget.initialMode!;
+    }
+  }
 
   Future<void> _takePicture() async {
     if (_isTakingPicture) return; // 防抖
@@ -144,7 +156,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       Center(
                         child: AspectRatio(
                           aspectRatio: aspectRatio,
-                          child: Container(color: const Color(0xFF121416)),
+                          child: Container(color: const Color(0xFF37474F)), // 深灰色 - 符合设计规范
                         ),
                       ),
                       // overlay painter

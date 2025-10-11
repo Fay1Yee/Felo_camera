@@ -1,0 +1,368 @@
+@custom-variant dark (&:is(.dark *));
+@custom-variant high-contrast (&:is(.high-contrast *));
+
+:root {
+  /* Font System - Nothing OS: Lightweight */
+  --font-size: 15px;
+  --font-weight-medium: 450;
+  --font-weight-normal: 350;
+  
+  /* Typography Scale - Airy & Minimal */
+  --text-display: 32px;
+  --line-height-display: 44px;
+  --text-title: 20px;
+  --line-height-title: 32px;
+  --text-body: 15px;
+  --line-height-body: 26px;
+  --text-caption: 13px;
+  --line-height-caption: 20px;
+  --text-mono: 13px;
+  --line-height-mono: 20px;
+
+  /* Spacing System - Compact & Efficient (新极简主义) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Border Radius - Squared & Minimal (新极简主义) */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;   /* 按钮 - 方正 */
+  --radius-lg: 8px;   /* 卡片 - 轻微圆角 */
+  --radius-xl: 12px;  /* 特殊元素 */
+  --radius-full: 9999px;
+
+  /* Elevation/Shadows - Subtle & Light (新极简主义) */
+  --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --elevation-2: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --elevation-3: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  /* Nothing OS Brand Colors - Muted & Professional (新极简主义) */
+  --color-brand-primary: #FFD84D;    /* 明亮黄 - 按钮、提示 */
+  --color-brand-secondary: #FFFBEA;  /* 极浅黄 - 卡片背景 */
+  --color-brand-accent: #F5C842;     /* 柔和黄 - hover状态 */
+
+  /* Accent Colors - Forest Green (辅助色：墨绿) */
+  --color-accent-primary: #2F5233;   /* 墨绿色 - 重要信息 */
+  --color-accent-secondary: #EDF7ED; /* 极浅绿色 - 背景 */
+  --color-accent-tertiary: #66BB6A;  /* 柔和绿 - 成功状态 */
+
+  /* Semantic Colors - Muted & Gentle (新极简主义) */
+  --color-success: #66BB6A;          /* 柔和绿 - 成功 */
+  --color-warning: #FFA726;          /* 柔和橙 - 警告 */
+  --color-error: #EF5350;            /* 红色 - 错误 */
+  --color-info: #42A5F5;             /* 蓝色 - 信息 */
+
+  /* Neutral Gray Scale - Cool & Neutral (新极简主义) */
+  --color-gray-50: #FAFAFA;          /* 极浅灰 - 主背景 */
+  --color-gray-100: #F5F5F5;         /* 浅灰 - 次级背景 */
+  --color-gray-200: #EEEEEE;         /* 浅灰 - 分隔线 */
+  --color-gray-300: #E0E0E0;         /* 中浅灰 - 边框 */
+  --color-gray-400: #BDBDBD;         /* 中灰 - 图标 */
+  --color-gray-500: #9E9E9E;         /* 中深灰 - 次要文字 */
+  --color-gray-600: #757575;         /* 深灰 - 文字 */
+  --color-gray-700: #616161;         /* 更深灰 */
+  --color-gray-800: #424242;         /* 最深灰 - 主文字 */
+  --color-gray-900: #212121;         /* 黑色 */
+
+  /* Surface Colors - Clean & White (新极简主义) */
+  --color-background: #FAFAFA;       /* 极浅灰主背景 - 中性不偏色 */
+  --color-surface: #FFFFFF;          /* 纯白卡片 */
+  --color-surface-secondary: #FFF9E6; /* 极浅黄卡片 */
+  --color-surface-tertiary: #F5F5F5; /* 浅灰背景 */
+  --color-surface-accent: #EDF7ED;   /* 极浅绿背景 */
+
+  /* Text Colors - Neutral & Clean (新极简主义) */
+  --color-text-primary: #424242;     /* 深灰 - 主文字 */
+  --color-text-secondary: #9E9E9E;   /* 中灰 - 次要文字 */
+  --color-text-tertiary: #BDBDBD;    /* 浅灰 - 辅助文字 */
+  --color-text-inverse: #FFFFFF;     /* 白色 - 反色文字 */
+  --color-text-accent: #2F5233;      /* 墨绿 - 强调文字 */
+  
+  /* Dot Matrix Elements */
+  --dot-size: 2px;
+  --dot-spacing: 8px;
+
+  /* Legacy compatibility */
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-brand-primary);
+  --primary-foreground: var(--color-gray-900);
+  --secondary: var(--color-surface-secondary);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-surface-tertiary);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-brand-accent);
+  --accent-foreground: var(--color-gray-900);
+  --destructive: var(--color-error);
+  --destructive-foreground: var(--color-text-inverse);
+  --border: var(--color-gray-200);
+  --input: transparent;
+  --input-background: var(--color-surface);
+  --switch-background: var(--color-gray-300);
+  --ring: var(--color-brand-primary);
+  --chart-1: var(--color-brand-primary);
+  --chart-2: var(--color-brand-secondary);
+  --chart-3: var(--color-success);
+  --chart-4: var(--color-warning);
+  --chart-5: var(--color-error);
+  --radius: var(--radius-lg);
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-text-primary);
+  --sidebar-primary: var(--color-brand-primary);
+  --sidebar-primary-foreground: var(--color-text-primary);
+  --sidebar-accent: var(--color-surface-secondary);
+  --sidebar-accent-foreground: var(--color-text-primary);
+  --sidebar-border: var(--color-gray-200);
+  --sidebar-ring: var(--color-brand-primary);
+}
+
+.dark {
+  /* Surface Colors */
+  --color-background: var(--color-gray-900);
+  --color-surface: var(--color-gray-800);
+  --color-surface-secondary: var(--color-gray-700);
+  --color-surface-tertiary: var(--color-gray-600);
+
+  /* Text Colors */
+  --color-text-primary: var(--color-gray-50);
+  --color-text-secondary: var(--color-gray-400);
+  --color-text-inverse: var(--color-gray-900);
+
+  /* Legacy compatibility */
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-brand-primary);
+  --primary-foreground: var(--color-text-inverse);
+  --secondary: var(--color-surface-secondary);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-surface-tertiary);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-brand-accent);
+  --accent-foreground: var(--color-text-inverse);
+  --destructive: var(--color-error);
+  --destructive-foreground: var(--color-text-inverse);
+  --border: var(--color-gray-700);
+  --input: var(--color-surface-secondary);
+  --ring: var(--color-brand-primary);
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-text-primary);
+  --sidebar-primary: var(--color-brand-primary);
+  --sidebar-primary-foreground: var(--color-text-inverse);
+  --sidebar-accent: var(--color-surface-secondary);
+  --sidebar-accent-foreground: var(--color-text-primary);
+  --sidebar-border: var(--color-gray-700);
+  --sidebar-ring: var(--color-brand-primary);
+}
+
+.high-contrast {
+  /* High contrast mode overrides */
+  --color-background: #000000;
+  --color-surface: #000000;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #FFFFFF;
+  --color-brand-primary: #00FFFF;
+  --color-brand-secondary: #00FF00;
+  --color-brand-accent: #FFFF00;
+  --color-success: #00FF00;
+  --color-warning: #FFFF00;
+  --color-error: #FF0000;
+  --color-info: #00FFFF;
+  --border: #FFFFFF;
+
+  /* Legacy compatibility for high contrast */
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text-primary);
+  --primary: var(--color-brand-primary);
+  --primary-foreground: #000000;
+  --destructive: var(--color-error);
+  --destructive-foreground: #000000;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Dot Matrix Patterns */
+  .dot-divider {
+    border: none;
+    height: 1px;
+    background-image: linear-gradient(to right, currentColor 33%, transparent 0%);
+    background-position: 0 0;
+    background-size: 6px 1px;
+    background-repeat: repeat-x;
+    opacity: 0.3;
+  }
+  
+  .dot-border {
+    border: 1px dashed currentColor;
+    border-image: none;
+    opacity: 0.2;
+  }
+  
+  .dot-grid-bg {
+    background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+    background-size: var(--dot-spacing) var(--dot-spacing);
+    opacity: 0.05;
+  }
+  
+  .dot-halo {
+    position: relative;
+  }
+  
+  .dot-halo::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: inherit;
+    background-image: radial-gradient(circle, currentColor 1.5px, transparent 1.5px);
+    background-size: 10px 10px;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  /* Word Cloud Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    /* Display Style - 28/36 */
+    .text-display, h1 {
+      font-size: var(--text-display);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-display);
+    }
+
+    /* Title Style - 22/28 */
+    .text-title, h2 {
+      font-size: var(--text-title);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-title);
+    }
+
+    /* Body Style - 16/24 */
+    .text-body, h3, h4, p {
+      font-size: var(--text-body);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-body);
+    }
+
+    h3, h4 {
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* Caption Style - 12/16 */
+    .text-caption, small {
+      font-size: var(--text-caption);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-caption);
+    }
+
+    /* Mono Style - 12/16 */
+    .text-mono, code, pre {
+      font-size: var(--text-mono);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-mono);
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    }
+
+    label {
+      font-size: var(--text-body);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-body);
+    }
+
+    button {
+      font-size: var(--text-body);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-body);
+    }
+
+    input, textarea, select {
+      font-size: var(--text-body);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-body);
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}

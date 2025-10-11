@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../config/nothing_theme.dart';
 import '../models/analysis_history.dart';
+import '../services/history_notifier.dart';
 
 /// Nothing OS风格的相册组件
 class NothingPhotoAlbum extends StatefulWidget {
@@ -21,6 +23,8 @@ class NothingPhotoAlbum extends StatefulWidget {
 
 class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
   String _selectedFilter = 'all';
+  List<AnalysisHistory> _currentHistories = [];
+  StreamSubscription<HistoryEvent>? _historySubscription;
   
   final List<AlbumFilter> _filters = [
     AlbumFilter('all', '全部', Icons.photo_library),
@@ -29,6 +33,61 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
     AlbumFilter('travel', '旅行', Icons.luggage),
     AlbumFilter('normal', '日常', Icons.camera_alt),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentHistories = List.from(widget.histories);
+    _setupHistoryListener();
+  }
+
+  @override
+  void dispose() {
+    _historySubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(NothingPhotoAlbum oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.histories != oldWidget.histories) {
+      _currentHistories = List.from(widget.histories);
+    }
+  }
+
+  /// 设置历史记录变化监听器
+  void _setupHistoryListener() {
+    _historySubscription = HistoryNotifier.instance.historyStream.listen((event) {
+      if (mounted) {
+        setState(() {
+          switch (event.type) {
+            case HistoryEventType.added:
+              if (event.history != null) {
+                _currentHistories.removeWhere((h) => h.id == event.history!.id);
+                _currentHistories.insert(0, event.history!);
+              }
+              break;
+            case HistoryEventType.deleted:
+              if (event.historyId != null) {
+                _currentHistories.removeWhere((h) => h.id == event.historyId);
+              }
+              break;
+            case HistoryEventType.cleared:
+              _currentHistories.clear();
+              break;
+            case HistoryEventType.updated:
+              if (event.history != null) {
+                final index = _currentHistories.indexWhere((h) => h.id == event.history!.id);
+                if (index != -1) {
+                  _currentHistories[index] = event.history!;
+                }
+              }
+              break;
+          }
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +257,7 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
                 ),
                 decoration: BoxDecoration(
                   color: NothingTheme.nothingYellow,
-                  borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                  borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                 ),
                 child: Text(
                   '${monthGroup.histories.length}张',
@@ -344,9 +403,9 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
 
   List<AnalysisHistory> _getFilteredHistories() {
     if (_selectedFilter == 'all') {
-      return widget.histories;
+      return _currentHistories;
     }
-    return widget.histories.where((history) => history.mode == _selectedFilter).toList();
+    return _currentHistories.where((history) => history.mode == _selectedFilter).toList();
   }
 
   Color _getModeColor(String mode) {

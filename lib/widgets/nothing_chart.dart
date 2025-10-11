@@ -25,7 +25,11 @@ class NothingChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      decoration: NothingTheme.nothingCardDecoration,
+      decoration: BoxDecoration(
+        color: NothingTheme.surface,
+        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        border: Border.all(color: NothingTheme.gray200, width: 1),
+      ),
       padding: const EdgeInsets.all(NothingTheme.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +37,7 @@ class NothingChart extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              fontSize: NothingTheme.fontSizeTitle,
+              fontSize: NothingTheme.fontSizeHeadline,
               fontWeight: NothingTheme.fontWeightSemiBold,
               color: NothingTheme.nothingBlack,
             ),
@@ -105,7 +109,7 @@ class NothingChart extends StatelessWidget {
                       end: Alignment.bottomCenter,
                     ),
                     borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(NothingTheme.radiusSmall),
+                      top: Radius.circular(NothingTheme.radiusSm),
                     ),
                     boxShadow: [
                       BoxShadow(

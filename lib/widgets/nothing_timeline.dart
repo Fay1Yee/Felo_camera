@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 import '../config/nothing_theme.dart';
 import '../models/analysis_history.dart';
+import '../services/history_notifier.dart';
 import 'dart:convert';
-// 已移除宠物语气助手导入，统一采用专业、亲和的文本风格
 
 /// Nothing OS风格的时间轴组件
-class NothingTimeline extends StatelessWidget {
+class NothingTimeline extends StatefulWidget {
   final List<AnalysisHistory> histories;
   final Function(AnalysisHistory)? onItemTap;
   final Function(AnalysisHistory)? onItemDelete;
@@ -19,8 +20,71 @@ class NothingTimeline extends StatelessWidget {
   });
 
   @override
+  State<NothingTimeline> createState() => _NothingTimelineState();
+}
+
+class _NothingTimelineState extends State<NothingTimeline> {
+  List<AnalysisHistory> _currentHistories = [];
+  StreamSubscription<HistoryEvent>? _historySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentHistories = List.from(widget.histories);
+    _setupHistoryListener();
+  }
+
+  @override
+  void dispose() {
+    _historySubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(NothingTimeline oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.histories != oldWidget.histories) {
+      _currentHistories = List.from(widget.histories);
+    }
+  }
+
+  /// 设置历史记录变化监听器
+  void _setupHistoryListener() {
+    _historySubscription = HistoryNotifier.instance.historyStream.listen((event) {
+      if (mounted) {
+        setState(() {
+          switch (event.type) {
+            case HistoryEventType.added:
+              if (event.history != null) {
+                _currentHistories.removeWhere((h) => h.id == event.history!.id);
+                _currentHistories.insert(0, event.history!);
+              }
+              break;
+            case HistoryEventType.deleted:
+              if (event.historyId != null) {
+                _currentHistories.removeWhere((h) => h.id == event.historyId);
+              }
+              break;
+            case HistoryEventType.cleared:
+              _currentHistories.clear();
+              break;
+            case HistoryEventType.updated:
+              if (event.history != null) {
+                final index = _currentHistories.indexWhere((h) => h.id == event.history!.id);
+                if (index != -1) {
+                  _currentHistories[index] = event.history!;
+                }
+              }
+              break;
+          }
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (histories.isEmpty) {
+    if (_currentHistories.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +108,7 @@ class NothingTimeline extends StatelessWidget {
     }
 
     // 按日期分组
-    final groupedHistories = _groupHistoriesByDate(histories);
+    final groupedHistories = _groupHistoriesByDate(_currentHistories);
     
     return ListView.builder(
       padding: const EdgeInsets.all(NothingTheme.spacingMedium),
@@ -178,9 +242,13 @@ class NothingTimeline extends StatelessWidget {
             child: Container(
               margin: const EdgeInsets.only(bottom: NothingTheme.spacingMedium),
               child: GestureDetector(
-                onTap: () => onItemTap?.call(history),
+                onTap: () => widget.onItemTap?.call(history),
                 child: Container(
-                  decoration: NothingTheme.nothingCardDecoration,
+                  decoration: BoxDecoration(
+                    color: NothingTheme.surface,
+                    borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+                    border: Border.all(color: NothingTheme.gray200, width: 1),
+                  ),
                   padding: const EdgeInsets.all(NothingTheme.spacingMedium),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +313,7 @@ class NothingTimeline extends StatelessWidget {
                               color: history.isRealtimeAnalysis 
                                   ? NothingTheme.successGreen.withValues(alpha: 0.1)
                                   : NothingTheme.infoBlue.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                              borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                             ),
                             child: Text(
                               history.isRealtimeAnalysis ? '实时分析' : '手动拍照',
@@ -267,7 +335,7 @@ class NothingTimeline extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: NothingTheme.nothingYellow,
-                              borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                              borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                             ),
                             child: Text(
                               '置信度：${history.result.confidence}%', // 清晰专业表达
@@ -279,16 +347,16 @@ class NothingTimeline extends StatelessWidget {
                             ),
                           ),
                           // 删除按钮
-                          if (onItemDelete != null) ...[
+                          if (widget.onItemDelete != null) ...[
                             const SizedBox(width: NothingTheme.spacingSmall),
                             Builder(
                               builder: (context) => GestureDetector(
-                                onTap: onItemDelete != null ? () => _showDeleteDialog(context, history, onItemDelete!) : null,
+                                onTap: widget.onItemDelete != null ? () => _showDeleteDialog(context, history, widget.onItemDelete!) : null,
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
                                     color: NothingTheme.nothingDarkGray.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                                    borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                                   ),
                                   child: const Icon(
                                     Icons.delete_outline,
@@ -463,7 +531,7 @@ class DateGroup {
         badgeText = '安全风险低';
         break;
       case 'HIGH':
-        badgeColor = NothingTheme.errorRed;
+        badgeColor = NothingTheme.error;
         badgeText = '安全风险高';
         break;
       default:
@@ -491,7 +559,7 @@ class DateGroup {
                 ),
                 decoration: BoxDecoration(
                   color: badgeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+                  borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -656,7 +724,7 @@ class DateGroup {
       ),
       decoration: BoxDecoration(
         color: NothingTheme.nothingLightGray.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+        borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
       ),
       child: Text(
         text,

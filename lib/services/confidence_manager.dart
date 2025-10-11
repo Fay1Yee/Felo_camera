@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// 置信度管理器 - 处理动态阈值和多层次置信度系统
 class ConfidenceManager {
   static const Map<String, int> _defaultThresholds = {

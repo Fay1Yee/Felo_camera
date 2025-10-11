@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 import '../models/behavior_analytics.dart';
 import '../models/analysis_history.dart';
+import '../services/history_notifier.dart';
 import '../config/nothing_theme.dart';
 
 class BehaviorAnalyticsWidget extends StatefulWidget {
@@ -21,19 +23,66 @@ class _BehaviorAnalyticsWidgetState extends State<BehaviorAnalyticsWidget> {
   String _selectedTimeRange = '7天';
   bool _isLoading = false;
   String? _errorMessage;
+  List<AnalysisHistory> _currentHistories = [];
+  StreamSubscription<HistoryEvent>? _historySubscription;
 
   @override
   void initState() {
     super.initState();
+    _currentHistories = List.from(widget.histories);
+    _setupHistoryListener();
     _updateAnalytics();
+  }
+
+  @override
+  void dispose() {
+    _historySubscription?.cancel();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(BehaviorAnalyticsWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.histories != widget.histories) {
+      _currentHistories = List.from(widget.histories);
       _updateAnalytics();
     }
+  }
+
+  /// 设置历史记录变化监听器
+  void _setupHistoryListener() {
+    _historySubscription = HistoryNotifier.instance.historyStream.listen((event) {
+      if (mounted) {
+        setState(() {
+          switch (event.type) {
+            case HistoryEventType.added:
+              if (event.history != null) {
+                _currentHistories.removeWhere((h) => h.id == event.history!.id);
+                _currentHistories.insert(0, event.history!);
+              }
+              break;
+            case HistoryEventType.deleted:
+              if (event.historyId != null) {
+                _currentHistories.removeWhere((h) => h.id == event.historyId);
+              }
+              break;
+            case HistoryEventType.cleared:
+              _currentHistories.clear();
+              break;
+            case HistoryEventType.updated:
+              if (event.history != null) {
+                final index = _currentHistories.indexWhere((h) => h.id == event.history!.id);
+                if (index != -1) {
+                  _currentHistories[index] = event.history!;
+                }
+              }
+              break;
+          }
+        });
+        // 历史记录变化后重新计算分析结果
+        _updateAnalytics();
+      }
+    });
   }
 
   Future<void> _updateAnalytics() async {
@@ -87,11 +136,11 @@ class _BehaviorAnalyticsWidgetState extends State<BehaviorAnalyticsWidget> {
         duration = const Duration(days: 30);
         break;
       default:
-        return widget.histories;
+        return _currentHistories;
     }
     
     final cutoffDate = now.subtract(duration);
-    return widget.histories.where((h) => h.timestamp.isAfter(cutoffDate)).toList();
+    return _currentHistories.where((h) => h.timestamp.isAfter(cutoffDate)).toList();
   }
 
   @override
@@ -99,7 +148,11 @@ class _BehaviorAnalyticsWidgetState extends State<BehaviorAnalyticsWidget> {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
-          decoration: NothingTheme.nothingCardDecoration,
+          decoration: BoxDecoration(
+          color: NothingTheme.surface,
+          borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+          border: Border.all(color: NothingTheme.gray200, width: 1),
+        ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -201,7 +254,7 @@ class _BehaviorAnalyticsWidgetState extends State<BehaviorAnalyticsWidget> {
             padding: const EdgeInsets.all(NothingTheme.spacingSmall),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+              borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
             ),
             child: const Icon(
               Icons.analytics,

@@ -13,7 +13,7 @@ import 'package:pet_camera_demo/main.dart';
 void main() {
   testWidgets('Pet Camera App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const PetCameraApp());
+    await tester.pumpWidget(const MyApp());
 
     // Verify that the app loads without crashing
     expect(find.byType(MaterialApp), findsOneWidget);
