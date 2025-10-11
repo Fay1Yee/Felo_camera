@@ -1,13 +1,22 @@
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
+import 'network_manager.dart';
 
 class DoubaoApiClient {
   static final DoubaoApiClient _instance = DoubaoApiClient._();
   static DoubaoApiClient get instance => _instance;
 
-  DoubaoApiClient._();
+  DoubaoApiClient._() {
+    // 预热豆包API连接，降低首包延迟
+    try {
+      NetworkManager.instance.preWarmConnections([ApiConfig.getChatCompletionsUrl()]);
+    } catch (e) {
+      debugPrint('预热豆包API连接失败: $e');
+    }
+  }
+
+  final NetworkManager _networkManager = NetworkManager.instance;
 
   /// 分析图像并返回结果
   Future<String> analyzeImage(Uint8List imageBytes, String prompt) async {
@@ -20,6 +29,15 @@ class DoubaoApiClient {
       Map<String, dynamic> requestBody = {
         'model': ApiConfig.doubaoModel,
         'messages': [
+          {
+            'role': 'system',
+            'content': [
+              {
+                'type': 'text',
+                'text': ApiConfig.systemPromptStyle,
+              }
+            ]
+          },
           {
             'role': 'user',
             'content': [
@@ -40,12 +58,12 @@ class DoubaoApiClient {
         'temperature': ApiConfig.defaultTemperature,
       };
 
-      // 发送请求
-      final response = await http.post(
+      // 使用统一的网络管理器（带重试与短超时）
+      final response = await _networkManager.post(
         Uri.parse(ApiConfig.getChatCompletionsUrl()),
         headers: ApiConfig.getHeaders(),
         body: jsonEncode(requestBody),
-      ).timeout(Duration(seconds: ApiConfig.requestTimeoutSeconds));
+      );
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -92,7 +110,7 @@ class DoubaoApiClient {
 3. 精力状态评估
 4. 行为特征分析
 
-请以JSON格式返回结果，包含以下字段：
+请以JSON格式返回结果，且仅返回JSON，不要包含任何额外文本或解释。字段如下：
 {
   "activityType": "活动类型",
   "energyLevel": 数值(1-10),

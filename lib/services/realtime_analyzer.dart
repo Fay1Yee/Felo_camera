@@ -20,7 +20,7 @@ class RealtimeAnalyzer {
   Timer? _analysisTimer;
   bool _isAnalyzing = false;
   bool _isEnabled = false;
-  File? _lastAnalyzedFile;
+  // 移除了未使用的持久字段 lastAnalyzedFile
   
   // 分析结果回调
   Function(AIResult, File)? _onAnalysisResult;
@@ -83,7 +83,6 @@ class RealtimeAnalyzer {
       final fileName = 'realtime_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final permanentPath = '${imagesDir.path}/$fileName';
       final localFile = await File(file.path).copy(permanentPath);
-      _lastAnalyzedFile = localFile;
       
       // 进行AI分析
       final result = await _apiClient.analyzeImage(localFile);

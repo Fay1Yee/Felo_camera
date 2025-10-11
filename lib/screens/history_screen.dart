@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/analysis_history.dart';
@@ -9,7 +10,7 @@ import '../widgets/nothing_timeline.dart';
 import '../widgets/nothing_photo_album.dart';
 import '../widgets/nothing_statistics.dart';
 import '../widgets/behavior_analytics_widget.dart';
-import '../utils/pet_conversation_helper.dart';
+// 已移除宠物语气助手，统一采用简洁、专业且亲和的文本风格
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -149,7 +150,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            PetConversationHelper.convertToPetTone(history.result).title, // 使用宠物语气标题
+                            history.result.title, // 使用专业、亲和且自然的原始风格
                             style: const TextStyle(
                               fontSize: NothingTheme.fontSizeHeadline,
                               fontWeight: NothingTheme.fontWeightBold,
@@ -194,7 +195,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                                   borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
                                 ),
                                 child: Text(
-                                  PetConversationHelper.getConfidenceExpression(history.result.confidence), // 使用友好的置信度表达
+                                  '置信度：${history.result.confidence}%', // 清晰专业表达
                                   style: const TextStyle(
                                     fontSize: NothingTheme.fontSizeCaption,
                                     fontWeight: NothingTheme.fontWeightBold,
@@ -364,7 +365,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              PetConversationHelper.convertToPetTone(history.result).title, // 使用宠物语气标题
+                              history.result.title,
                               style: TextStyle(
                                 fontSize: NothingTheme.fontSizeBody,
                                 color: NothingTheme.nothingBlack,
@@ -379,16 +380,22 @@ class _HistoryScreenState extends State<HistoryScreen>
                       _buildEnhancedDetailCard([
                         _buildDetailRow('分析模式', _getModeName(history.mode)),
                         _buildDetailRow('分析类型', history.isRealtimeAnalysis ? '实时分析' : '手动拍照'),
-                        _buildDetailRow('置信度', PetConversationHelper.getConfidenceExpression(history.result.confidence)), // 使用友好的置信度表达
+                        _buildDetailRow('置信度', '${history.result.confidence}%'), // 清晰专业表达
                         _buildDetailRow('拍摄时间', DateFormat('yyyy年MM月dd日 HH:mm:ss').format(history.timestamp)),
                       ]),
                       
                       // 附加信息
                       if (history.result.subInfo != null) ...[
                         const SizedBox(height: NothingTheme.spacingMedium),
-                        _buildEnhancedDetailCard([
-                          _buildDetailRow('附加信息', PetConversationHelper.convertToPetTone(history.result).subInfo ?? '暂无详细信息'), // 使用宠物语气子信息
-                        ], title: '详细信息'),
+                        if (history.mode == 'travel') ...[
+                          _buildEnhancedDetailCard([
+                            _buildTravelSummary(history.result.subInfo!),
+                          ], title: '出行分析'),
+                        ] else ...[
+                          _buildEnhancedDetailCard([
+                            _buildDetailRow('附加信息', history.result.subInfo ?? '暂无详细信息'), // 使用原始风格的附加信息
+                          ], title: '详细信息'),
+                        ],
                       ],
                     ],
                   ),
@@ -987,3 +994,254 @@ class _HistoryScreenState extends State<HistoryScreen>
 
 
 }
+
+
+
+  Widget _buildTravelSummary(String subInfoText) {
+    final data = _parseTravelSubInfo(subInfoText);
+    if (data == null) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: NothingTheme.spacingSmall),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 80,
+              child: Text(
+                '出行分析',
+                style: const TextStyle(
+                  fontSize: NothingTheme.fontSizeBody,
+                  color: NothingTheme.nothingGray,
+                ),
+              ),
+            ),
+            const SizedBox(width: NothingTheme.spacingMedium),
+            const Expanded(
+              child: Text(
+                '暂无结构化出行信息',
+                style: TextStyle(
+                  fontSize: NothingTheme.fontSizeBody,
+                  fontWeight: NothingTheme.fontWeightMedium,
+                  color: NothingTheme.nothingBlack,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final scene = data['scene_analysis'] as Map<String, dynamic>? ?? {};
+    final rec = data['recommendations'] as Map<String, dynamic>? ?? {};
+
+    final sceneType = scene['type']?.toString() ?? '未知场景';
+    final location = scene['location']?.toString() ?? '未知位置';
+    final weather = scene['weather']?.toString() ?? '未知天气';
+    final safety = scene['safety_level']?.toString().toUpperCase() ?? 'MEDIUM';
+
+    final activities = (rec['activities'] as List?)?.map((e) => e.toString()).toList() ?? const <String>[];
+    final safetyTips = (rec['safety_tips'] as List?)?.map((e) => e.toString()).toList() ?? const <String>[];
+    final travelAdvice = (rec['travel_advice'] as List?)?.map((e) => e.toString()).toList() ?? const <String>[];
+
+    Color badgeColor;
+    String badgeText;
+    switch (safety) {
+      case 'LOW':
+        badgeColor = NothingTheme.successGreen;
+        badgeText = '安全风险低';
+        break;
+      case 'HIGH':
+        badgeColor = NothingTheme.errorRed;
+        badgeText = '安全风险高';
+        break;
+      default:
+        badgeColor = NothingTheme.warningOrange;
+        badgeText = '安全风险中';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 安全徽章与场景基本信息
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: NothingTheme.spacingSmall,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: badgeColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.shield_outlined, size: 14, color: badgeColor),
+                  const SizedBox(width: NothingTheme.spacingXSmall),
+                  Text(
+                    badgeText,
+                    style: TextStyle(
+                      fontSize: NothingTheme.fontSizeCaption,
+                      fontWeight: NothingTheme.fontWeightMedium,
+                      color: badgeColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            Text(
+              weather,
+              style: const TextStyle(
+                fontSize: NothingTheme.fontSizeCaption,
+                color: NothingTheme.nothingGray,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: NothingTheme.spacingSmall),
+        Row(
+          children: [
+            Icon(Icons.place_outlined, size: 16, color: NothingTheme.nothingGray),
+            const SizedBox(width: NothingTheme.spacingXSmall),
+            Expanded(
+              child: Text(
+                '$sceneType · $location',
+                style: const TextStyle(
+                  fontSize: NothingTheme.fontSizeBody,
+                  color: NothingTheme.nothingBlack,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // 推荐活动
+        if (activities.isNotEmpty) ...[
+          const SizedBox(height: NothingTheme.spacingSmall),
+          _sectionTitle('推荐活动', Icons.directions_walk_outlined),
+          const SizedBox(height: NothingTheme.spacingXSmall),
+          Wrap(
+            spacing: NothingTheme.spacingXSmall,
+            runSpacing: NothingTheme.spacingXSmall,
+            children: activities.map((a) => _chip(a)).toList(),
+          ),
+        ],
+
+        // 安全提示
+        if (safetyTips.isNotEmpty) ...[
+          const SizedBox(height: NothingTheme.spacingSmall),
+          _sectionTitle('安全提示', Icons.shield_outlined),
+          const SizedBox(height: NothingTheme.spacingXSmall),
+          Wrap(
+            spacing: NothingTheme.spacingXSmall,
+            runSpacing: NothingTheme.spacingXSmall,
+            children: safetyTips.map((s) => _chip(s)).toList(),
+          ),
+        ],
+
+        // 旅行建议
+        if (travelAdvice.isNotEmpty) ...[
+          const SizedBox(height: NothingTheme.spacingSmall),
+          _sectionTitle('旅行建议', Icons.map_outlined),
+          const SizedBox(height: NothingTheme.spacingXSmall),
+          Wrap(
+            spacing: NothingTheme.spacingXSmall,
+            runSpacing: NothingTheme.spacingXSmall,
+            children: travelAdvice.map((t) => _chip(t)).toList(),
+          ),
+        ],
+
+        if (activities.isEmpty && safetyTips.isEmpty && travelAdvice.isEmpty) ...[
+          const SizedBox(height: NothingTheme.spacingSmall),
+          _emptyHint('暂无详细建议'),
+        ],
+      ],
+    );
+  }
+
+  Map<String, dynamic>? _parseTravelSubInfo(String text) {
+    dynamic parsed;
+    try {
+      parsed = jsonDecode(text);
+    } catch (_) {
+      final match = RegExp(r'\{[\s\S]*\}').firstMatch(text);
+      if (match != null) {
+        try {
+          parsed = jsonDecode(match.group(0)!);
+        } catch (_) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+
+    if (parsed is Map<String, dynamic>) {
+      if (parsed.containsKey('scene_analysis') && parsed.containsKey('recommendations')) {
+        return parsed;
+      }
+      final sub = parsed['subInfo'];
+      if (sub is String) {
+        try {
+          final inner = jsonDecode(sub);
+          if (inner is Map<String, dynamic>) return inner;
+        } catch (_) {
+          final match = RegExp(r'\{[\s\S]*\}').firstMatch(sub);
+          if (match != null) {
+            try {
+              final inner = jsonDecode(match.group(0)!);
+              if (inner is Map<String, dynamic>) return inner;
+            } catch (_) {}
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  Widget _sectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: NothingTheme.nothingGray),
+        const SizedBox(width: NothingTheme.spacingXSmall),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: NothingTheme.fontSizeCaption,
+            fontWeight: NothingTheme.fontWeightMedium,
+            color: NothingTheme.nothingBlack,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _chip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: NothingTheme.spacingSmall,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: NothingTheme.nothingLightGray.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(NothingTheme.radiusSmall),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: NothingTheme.fontSizeCaption,
+          color: NothingTheme.nothingBlack,
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyHint(String text) => Text(
+        text,
+        style: TextStyle(
+          color: NothingTheme.nothingDarkGray,
+          fontSize: NothingTheme.fontSizeCaption,
+        ),
+      );

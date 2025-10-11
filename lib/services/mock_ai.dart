@@ -4,7 +4,8 @@ import '../models/ai_result.dart';
 import '../models/mode.dart';
 
 class MockAI {
-  final _rng = Random();
+  // ignore: unused_field
+  final Random _rng = Random();
 
   // 移除所有预设数据，仅保留错误情况下的占位符
   AIResult analyze(Mode mode) {

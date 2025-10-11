@@ -11,10 +11,13 @@ class ApiConfig {
   static const String doubaoApiKey = 'e779c50a-bc8c-4673-ada3-30c4e7987018';
   
   // API请求配置
-  static const int requestTimeoutSeconds = 30;
+  static const int requestTimeoutSeconds = 12; // 缩短超时以避免长时间阻塞
   static const int maxRetries = 3;
-  static const double defaultTemperature = 0.7;
-  static const int defaultMaxTokens = 1000;
+  static const double defaultTemperature = 0.3; // 降低温度以提升JSON一致性
+  static const int defaultMaxTokens = 300; // 降低生成token以加速返回
+  
+  // 统一的系统提示词：简洁、专业、亲和力强；避免“宠物对主人”式语气；表达自然流畅、清晰准确
+  static const String systemPromptStyle = '请以简洁、专业且亲和力强的表达方式进行输出，避免使用宠物对主人式的语气或过度拟人化。确保内容清晰准确、结构合理，并保持自然流畅的沟通效果。';
   
   // 图像处理配置
   static const int maxImageSizeBytes = 10 * 1024 * 1024; // 10MB

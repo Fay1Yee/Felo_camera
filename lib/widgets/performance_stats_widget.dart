@@ -230,6 +230,23 @@ class _PerformanceStatsWidgetState extends State<PerformanceStatsWidget> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      '最近响应: ${stats.lastResponseTime.toStringAsFixed(0)}ms',
+                      style: TextStyle(
+                        color: _getResponseTimeColor(stats.lastResponseTime.toInt()),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      '最后调用: ${_formatTimestamp(stats.lastCallTime)}',
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
               ],
             ),
           );
@@ -283,5 +300,14 @@ class _PerformanceStatsWidgetState extends State<PerformanceStatsWidget> {
     if (milliseconds < 1000) return Colors.green;
     if (milliseconds < 3000) return Colors.orange;
     return NothingTheme.warningOrange;
+  }
+  String _formatTimestamp(DateTime time) {
+    if (time.millisecondsSinceEpoch == 0) return '-';
+    final now = DateTime.now();
+    final diff = now.difference(time);
+    if (diff.inSeconds < 60) return '${diff.inSeconds}s前';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}min前';
+    if (diff.inHours < 24) return '${diff.inHours}h前';
+    return '${time.month.toString().padLeft(2, '0')}-${time.day.toString().padLeft(2, '0')} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 }

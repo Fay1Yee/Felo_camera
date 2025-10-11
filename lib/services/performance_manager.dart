@@ -17,7 +17,7 @@ class PerformanceManager {
   Timer? _memoryMonitorTimer;
   Timer? _batteryOptimizationTimer;
   bool _isLowPowerMode = false;
-  int _currentMemoryUsage = 0;
+  final int _currentMemoryUsage = 0;
   
   // 缓存管理
   final Map<String, DateTime> _imageCache = {};
@@ -147,8 +147,7 @@ class PerformanceManager {
   /// 压缩图片以节省内存和存储
   Future<File> compressImage(File originalFile) async {
     try {
-      // 使用设备配置中的压缩质量
-      final quality = DeviceConfig.imageCompressionQuality;
+      // 使用设备配置中的压缩质量（简化实现，暂不使用具体数值）
       
       // 这里应该使用image压缩库，简化实现
       // 实际应用中可以使用flutter_image_compress

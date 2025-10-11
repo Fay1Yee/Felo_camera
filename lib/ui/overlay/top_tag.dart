@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/nothing_theme.dart';
 import '../../models/ai_result.dart';
-import '../../utils/pet_conversation_helper.dart';
+// 已移除宠物语气助手导入，TopTag 直接展示原始分析结果，风格简洁专业
 
 class TopTag extends StatefulWidget {
   final AIResult result;
@@ -50,7 +50,7 @@ class _TopTagState extends State<TopTag> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // 转换为宠物对话语气
-    final petResult = PetConversationHelper.convertToPetTone(widget.result);
+    final petResult = widget.result; // 使用专业、亲和且自然的原始风格，不再进行“宠物对主人”式转换
     
     final screenWidth = MediaQuery.of(context).size.width;
     final fontSize = widget.fontSize ?? (screenWidth < 400 ? 14.0 : 16.0);
@@ -91,7 +91,7 @@ class _TopTagState extends State<TopTag> with TickerProviderStateMixin {
               children: [
                 // 主标题
                 Text(
-                  petResult.title, // 使用转换后的宠物语气标题
+                  petResult.title,
                   style: TextStyle(
                     color: NothingTheme.nothingYellow,
                     fontSize: fontSize,
@@ -107,12 +107,12 @@ class _TopTagState extends State<TopTag> with TickerProviderStateMixin {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      PetConversationHelper.getRandomPetEmoji(),
+                      '', // 移除过度拟人化的宠物表情符号
                       style: TextStyle(fontSize: smallFontSize),
                     ),
                     const SizedBox(width: NothingTheme.spacingSmall),
                     Text(
-                      PetConversationHelper.getConfidenceExpression(petResult.confidence),
+                      '置信度：${petResult.confidence}%', // 改为清晰专业表达
                       style: TextStyle(
                         color: NothingTheme.nothingWhite,
                         fontSize: smallFontSize,
@@ -126,7 +126,7 @@ class _TopTagState extends State<TopTag> with TickerProviderStateMixin {
                 if (petResult.subInfo != null && petResult.subInfo!.isNotEmpty) ...[
                   const SizedBox(height: NothingTheme.spacingSmall),
                   Text(
-                    petResult.subInfo!, // 使用转换后的宠物语气子信息
+                    petResult.subInfo ?? '',
                     style: TextStyle(
                       color: NothingTheme.nothingWhite.withValues(alpha: 0.8),
                       fontSize: smallFontSize,

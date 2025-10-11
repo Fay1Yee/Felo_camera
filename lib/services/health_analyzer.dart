@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import '../models/health_report.dart';
-import 'doubao_api_client.dart';
+import 'api_client.dart';
 
 /// 宠物健康分析器 - 基于图像进行健康状况评估
 class HealthAnalyzer {
@@ -22,7 +22,7 @@ class HealthAnalyzer {
     debugPrint('🏥 开始健康分析: $petName ($petType)');
     
     try {
-      // 读取并解码图像
+      // 读取并解码图像（用于校验）
       final bytes = await imageFile.readAsBytes();
       final image = img.decodeImage(bytes);
       
@@ -30,11 +30,36 @@ class HealthAnalyzer {
         throw Exception('无法解码图像文件');
       }
 
-      // 生成健康报告
-      final report = await _generateHealthReport(image, petName, petType);
-      
-      debugPrint('✅ 健康分析完成: ${report.healthAssessment.healthStatus}');
-      return report;
+      // 统一使用 ApiClient 调用豆包
+      try {
+        final ai = await ApiClient.instance.analyzeImage(imageFile, mode: 'health');
+        // 尝试从 AIResult.subInfo 解析结构化 JSON
+        Map<String, dynamic>? analysisResult;
+        try {
+          analysisResult = ai.subInfo != null ? jsonDecode(ai.subInfo!) : null;
+        } catch (_) {
+          final extracted = ai.subInfo != null ? _extractJson(ai.subInfo!) : null;
+          if (extracted != null) {
+            try {
+              analysisResult = jsonDecode(extracted);
+            } catch (_) {}
+          }
+        }
+
+        if (analysisResult != null) {
+          // 基于结构化结果构建报告
+          final timestamp = DateTime.now();
+          final petId = '${petType.toLowerCase()}_${timestamp.millisecondsSinceEpoch}';
+          final archiveId = 'health_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}_$petId';
+          return _buildHealthReportFromApi(analysisResult, petId, timestamp, petName, petType, archiveId);
+        }
+        
+        // 严格要求结构化JSON，否则返回错误
+        return _generateErrorReport(petName, petType, '豆包响应缺少结构化JSON');
+      } catch (e) {
+        debugPrint('⚠️ 统一API分析失败: $e');
+        return _generateErrorReport(petName, petType, e.toString());
+      }
       
     } catch (e) {
       debugPrint('❌ 健康分析失败: $e');
@@ -42,43 +67,72 @@ class HealthAnalyzer {
     }
   }
 
-  /// 生成健康报告
+  /// 从文本中提取JSON片段
+  String? _extractJson(String text) {
+    final start = text.indexOf('{');
+    final end = text.lastIndexOf('}');
+    if (start != -1 && end != -1 && end > start) {
+      return text.substring(start, end + 1);
+    }
+    return null;
+  }
+
+  /// 使用 AIResult 构建简化的健康报告
+  // ignore: unused_element
+  HealthReport _buildReportFromAiResult(dynamic ai, img.Image image, String petName, String petType) {
+    final timestamp = DateTime.now();
+    final petId = '${petType.toLowerCase()}_${timestamp.millisecondsSinceEpoch}';
+    // ignore: unused_local_variable
+    final archiveId = 'health_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}_$petId';
+
+    // 基于图像简单分析以补充指标
+    final imageAnalysis = _analyzeImageForHealth(image);
+    final physicalIndicators = _generatePhysicalIndicators(imageAnalysis, petType);
+    final behaviorAnalysis = _generateBehaviorAnalysis(imageAnalysis, petType);
+
+    final healthStatus = ai.title.isNotEmpty ? '一般' : '未知';
+    final riskLevel = ai.confidence >= 80 ? '低' : (ai.confidence >= 60 ? '中' : '高');
+
+    final healthAssessment = HealthAssessment(
+      healthStatus: healthStatus,
+      riskLevel: riskLevel,
+      overallScore: (ai.confidence).round(),
+      healthConcerns: [ai.subInfo],
+      positiveAspects: ['图像分析完成'],
+    );
+
+    return HealthReport(
+      petId: petId,
+      timestamp: timestamp,
+      petName: petName,
+      petType: petType,
+      breed: _inferBreedFromType(petType),
+      physicalIndicators: physicalIndicators,
+      behaviorAnalysis: behaviorAnalysis,
+      healthAssessment: healthAssessment,
+      recommendations: ['保持规律喂养', '注意休息与活动平衡'],
+      archiveId: archiveId,
+    );
+  }
+
+  /// 生成健康报告（原逻辑保留）
+  // ignore: unused_element
   Future<HealthReport> _generateHealthReport(img.Image image, String petName, String petType) async {
     final timestamp = DateTime.now();
     final petId = '${petType.toLowerCase()}_${timestamp.millisecondsSinceEpoch}';
-    final archiveId = 'health_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}_${petId}';
+    // ignore: unused_local_variable
+    final archiveId = 'health_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}_$petId';
 
     try {
-      // 将图像转换为字节数组
-      final imageBytes = Uint8List.fromList(img.encodeJpg(image));
-      
-      // 使用豆包API分析健康状况
-      final apiResponse = await DoubaoApiClient.instance.analyzePetHealth(
-        imageBytes, 
-        petName, 
-        petType
-      );
-      
-      // 解析API响应
-      Map<String, dynamic> analysisResult;
-      try {
-        analysisResult = jsonDecode(apiResponse);
-      } catch (e) {
-        // 如果JSON解析失败，使用默认分析
-        debugPrint('⚠️ API响应解析失败，使用本地分析: $e');
-        return _generateLocalHealthReport(image, petName, petType);
-      }
-      
-      // 基于API结果生成报告
-      return _buildHealthReportFromApi(analysisResult, petId, timestamp, petName, petType, archiveId);
-      
+      // 旧逻辑：直接走豆包API，已弃用，统一通过 ApiClient
+      throw Exception('use ApiClient only');
     } catch (e) {
-      debugPrint('⚠️ API调用失败，使用本地分析: $e');
-      return _generateLocalHealthReport(image, petName, petType);
+      debugPrint('⚠️ API调用失败: $e');
+      return _generateErrorReport(petName, petType, e.toString());
     }
   }
 
-  /// 基于API结果构建健康报告
+  /// 基于API结果构建健康报告（原方法保留）
   HealthReport _buildHealthReportFromApi(
     Map<String, dynamic> analysisResult, 
     String petId, 
@@ -131,6 +185,7 @@ class HealthAnalyzer {
     final observations = List<String>.from(analysisResult['observations'] ?? []);
     
     // 基于健康状态调整指标
+    // ignore: unused_local_variable
     double baseScore = healthStatus == '健康' ? 0.8 : 
                       healthStatus == '一般' ? 0.6 : 0.4;
     
@@ -150,6 +205,7 @@ class HealthAnalyzer {
 
   /// 基于API结果生成行为分析
   BehaviorAnalysis _generateBehaviorAnalysisFromApi(Map<String, dynamic> analysisResult, String petType) {
+    // ignore: unused_local_variable
     final random = math.Random();
     final observations = List<String>.from(analysisResult['observations'] ?? []);
     
@@ -180,6 +236,7 @@ class HealthAnalyzer {
   }
 
   /// 映射健康状态到身体状况
+  // ignore: unused_element
   String _mapHealthToCondition(String healthStatus) {
     switch (healthStatus) {
       case '健康':
@@ -206,10 +263,11 @@ class HealthAnalyzer {
   }
 
   /// 生成本地健康报告（备用方案）
+  // ignore: unused_element
   Future<HealthReport> _generateLocalHealthReport(img.Image image, String petName, String petType) async {
     final timestamp = DateTime.now();
     final petId = '${petType.toLowerCase()}_${timestamp.millisecondsSinceEpoch}';
-    final archiveId = 'health_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}_${petId}';
+    final archiveId = 'health_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}_$petId';
 
     // 分析图像特征
     final imageAnalysis = _analyzeImageForHealth(image);

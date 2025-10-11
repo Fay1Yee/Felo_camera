@@ -172,6 +172,11 @@ class PerformanceMonitor {
           ? metrics.map((m) => m.responseTime.inMilliseconds).reduce((a, b) => a + b) / metrics.length 
           : 0.0;
       
+      // 最近一次调用
+      final lastMetric = metrics.isNotEmpty ? metrics.last : null;
+      final lastResponseTime = lastMetric != null ? lastMetric.responseTime.inMilliseconds.toDouble() : 0.0;
+      final lastCallTime = lastMetric?.timestamp ?? DateTime.fromMillisecondsSinceEpoch(0);
+      
       stats[entry.key] = EndpointStats(
         endpoint: entry.key,
         totalCalls: metrics.length,
@@ -185,6 +190,8 @@ class PerformanceMonitor {
         maxResponseTime: metrics.isNotEmpty 
             ? metrics.map((m) => m.responseTime.inMilliseconds).reduce((a, b) => a > b ? a : b).toDouble()
             : 0.0,
+        lastResponseTime: lastResponseTime,
+        lastCallTime: lastCallTime,
       );
     }
     
@@ -434,6 +441,8 @@ class EndpointStats {
   final double averageResponseTime;
   final double minResponseTime;
   final double maxResponseTime;
+  final double lastResponseTime; // 新增：最近响应时间（毫秒）
+  final DateTime lastCallTime; // 新增：最后调用时间
   
   EndpointStats({
     required this.endpoint,
@@ -444,6 +453,8 @@ class EndpointStats {
     required this.averageResponseTime,
     required this.minResponseTime,
     required this.maxResponseTime,
+    required this.lastResponseTime,
+    required this.lastCallTime,
   });
 }
 

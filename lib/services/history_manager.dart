@@ -65,12 +65,15 @@ class HistoryManager {
       }
     }
     
+    // 保存实际选择的模式
+    final String savedMode = mode;
+    
     final history = AnalysisHistory(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       timestamp: DateTime.now(),
       result: result,
       imagePath: validImagePath,
-      mode: mode,
+      mode: savedMode,
       isRealtimeAnalysis: isRealtimeAnalysis,
     );
     
@@ -99,7 +102,7 @@ class HistoryManager {
     
     await _saveHistories();
     
-    debugPrint('📝 添加分析历史记录: ${result.title} (${mode}模式)');
+    debugPrint('📝 添加分析历史记录: ${result.title} ($savedMode模式)');
   }
   
   /// 获取所有历史记录

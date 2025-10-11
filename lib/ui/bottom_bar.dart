@@ -21,7 +21,6 @@ class BottomBar extends StatelessWidget {
 
   Widget _modeChip(BuildContext context, Mode mode, String label) {
     final selected = current == mode;
-    final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = DeviceConfig.isTablet(context);
     
     // 根据设备类型调整芯片大小
@@ -80,7 +79,6 @@ class BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = DeviceConfig.isTablet(context);
     
     // 根据设备类型调整底部栏高度和间距
@@ -112,7 +110,7 @@ class BottomBar extends StatelessWidget {
         ],
       ),
       child: SafeArea(
-        child: isTablet || screenWidth > 600
+        child: isTablet
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,

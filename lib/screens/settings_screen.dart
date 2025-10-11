@@ -14,7 +14,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStateMixin {
   final ApiClient _apiClient = ApiClient.instance;
-  bool _useLocalAI = false;
   bool _hasLocalModel = false;
   bool _isLoading = true;
   
@@ -25,7 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
   bool _enableRealTimeAnalysis = true;
   String _selectedLanguage = '简体中文';
   String _selectedTheme = '跟随系统';
-  double _analysisConfidenceThreshold = 0.8;
+  double _analysisConfidenceThreshold = 0.5;
   
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -59,14 +58,13 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
       
       setState(() {
         _hasLocalModel = hasModel;
-        _useLocalAI = false; // 强制为false，禁用本地AI
         _enableNotifications = prefs.getBool('enable_notifications') ?? true;
         _enableHapticFeedback = prefs.getBool('enable_haptic_feedback') ?? true;
         _enableAutoSave = prefs.getBool('enable_auto_save') ?? true;
         _enableRealTimeAnalysis = prefs.getBool('enable_realtime_analysis') ?? true;
         _selectedLanguage = prefs.getString('selected_language') ?? '简体中文';
         _selectedTheme = prefs.getString('selected_theme') ?? '跟随系统';
-        _analysisConfidenceThreshold = prefs.getDouble('analysis_confidence_threshold') ?? 0.8;
+        _analysisConfidenceThreshold = prefs.getDouble('analysis_confidence_threshold') ?? 0.5;
         _isLoading = false;
       });
       

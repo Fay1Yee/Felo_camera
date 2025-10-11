@@ -1,12 +1,13 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../config/device_config.dart';
 import '../config/nothing_theme.dart';
@@ -14,7 +15,7 @@ import '../models/ai_result.dart';
 import '../models/mode.dart';
 import '../models/health_report.dart';
 import '../models/pet_activity.dart';
-import '../services/mock_ai.dart';
+
 import '../services/api_client.dart';
 import '../services/health_analyzer.dart';
 import '../services/activity_tracker.dart';
@@ -22,6 +23,7 @@ import '../services/travel_box_simulator.dart';
 import '../services/realtime_analyzer.dart';
 import '../services/history_manager.dart';
 import '../services/performance_manager.dart';
+import '../services/confidence_manager.dart';
 import '../screens/settings_screen.dart';
 import '../screens/history_screen.dart';
 import 'overlay/top_tag.dart';
@@ -42,23 +44,23 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver {
   CameraController? _controller;
-  bool _isInitialized = false;
   bool _isTakingPicture = false;
   bool _isAnalyzing = false;
   bool _isRealtimeEnabled = false;
 
   Mode _mode = Mode.normal;
   AIResult? _result;
+  // ignore: unused_field
   HealthReport? _healthReport;
+  // ignore: unused_field
   PetActivity? _petActivity;
   Map<String, dynamic>? _travelBoxData;
 
   List<CameraDescription>? _cameras;
   List<CameraDescription> _availableCameras = [];
-  int _selectedCameraIndex = 0;
+  final int _selectedCameraIndex = 0;
   int _currentCameraIndex = 0;
 
-  final _mockAI = MockAI();
   final _apiClient = ApiClient.instance;
   final _healthAnalyzer = HealthAnalyzer.instance;
   final _activityTracker = ActivityTracker.instance;
@@ -67,7 +69,6 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   final _historyManager = HistoryManager.instance;
   final _performanceManager = PerformanceManager.instance;
   final _preloader = Preloader.instance;
-  final _imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -139,19 +140,23 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
 
   Future<void> _initializeCamera() async {
     if (kIsWeb) {
-      setState(() => _isInitialized = true);
       return;
     }
 
     try {
-      // 请求相机权限
-      final cameraStatus = await Permission.camera.request();
+      // 并行执行权限请求和相机列表获取，提升初始化速度
+      final futures = await Future.wait([
+        Permission.camera.request(),
+        availableCameras(),
+      ]);
+      
+      final cameraStatus = futures[0] as PermissionStatus;
       if (!cameraStatus.isGranted) {
         _showError('需要相机权限才能使用此功能');
         return;
       }
 
-      _cameras = await availableCameras();
+      _cameras = futures[1] as List<CameraDescription>;
       _availableCameras = _cameras ?? [];
 
       if (_availableCameras.isEmpty) {
@@ -169,23 +174,34 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
         imageFormatGroup: cameraConfig['imageFormatGroup'] ?? ImageFormatGroup.jpeg,
       );
 
+      // 异步初始化相机控制器
       await _controller!.initialize();
       
-      // 设置优化的帧率
-      if (cameraConfig['fps'] != null) {
-        try {
-          await _controller!.setExposureMode(ExposureMode.auto);
-          await _controller!.setFocusMode(FocusMode.auto);
-        } catch (e) {
-          debugPrint('设置相机参数失败: $e');
-        }
-      }
+      // 异步设置相机参数，不阻塞主流程
+      _setCameraParametersAsync(cameraConfig);
 
+      // 相机初始化完成，立即更新UI状态
       if (mounted) {
-        setState(() => _isInitialized = true);
+        setState(() {
+          // 触发UI更新，显示相机预览
+        });
       }
     } catch (e) {
       _showError('相机初始化失败: $e');
+    }
+  }
+
+  /// 异步设置相机参数，不阻塞主初始化流程
+  void _setCameraParametersAsync(Map<String, dynamic> cameraConfig) {
+    if (cameraConfig['fps'] != null) {
+      Future.microtask(() async {
+        try {
+          await _controller?.setExposureMode(ExposureMode.auto);
+          await _controller?.setFocusMode(FocusMode.auto);
+        } catch (e) {
+          debugPrint('设置相机参数失败: $e');
+        }
+      });
     }
   }
 
@@ -233,7 +249,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
 
         // 计算相机预览在屏幕中的位置
         final previewLeft = (adaptedSize.width - previewDisplaySize.width) / 2;
-        final previewTop = (adaptedSize.height - previewDisplaySize.height) / 2;
+
         
         // 根据屏幕比例动态调整取景框大小
         double frameWidthRatio = 0.7;
@@ -333,19 +349,41 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                                       ),
                                     ),
                                   )
-                                : ClipRect(
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      child: FittedBox(
-                                        fit: BoxFit.cover,
-                                        child: SizedBox(
-                                          width: previewDisplaySize.width,
-                                          height: previewDisplaySize.height,
-                                          child: CameraPreview(_controller!),
+                                : (_controller != null && _controller!.value.isInitialized)
+                                    ? ClipRect(
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          child: FittedBox(
+                                            fit: BoxFit.cover,
+                                            child: SizedBox(
+                                              width: previewDisplaySize.width,
+                                              height: previewDisplaySize.height,
+                                              child: CameraPreview(_controller!),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        color: Colors.black,
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              CircularProgressIndicator(
+                                                 color: NothingTheme.yellowAlpha60,
+                                               ),
+                                              SizedBox(height: 16),
+                                              Text(
+                                                '正在初始化相机...',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: responsiveFontSize,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
                           ),
                         ],
                       ),
@@ -404,40 +442,93 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                   ),
                 ),
 
+              // 旅行模式分析面板（避免展示原始JSON）
+              if (_mode == Mode.travel && _travelBoxData != null)
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 92, // 避开底部控制栏
+                  child: Container(
+                    padding: const EdgeInsets.all(NothingTheme.spacingMedium),
+                    decoration: BoxDecoration(
+                      color: NothingTheme.whiteAlpha90,
+                      borderRadius: BorderRadius.circular(NothingTheme.radiusLarge),
+                      boxShadow: NothingTheme.nothingElevatedShadow,
+                      border: Border.all(
+                        color: NothingTheme.grayAlpha30,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 标题与安全等级
+                        Row(
+                          children: [
+                            const Icon(Icons.travel_explore, size: 18, color: NothingTheme.nothingBlack),
+                            const SizedBox(width: NothingTheme.spacingSmall),
+                            Expanded(
+                              child: Text(
+                                '出行场景',
+                                style: const TextStyle(
+                                  fontSize: NothingTheme.fontSizeBody,
+                                  fontWeight: NothingTheme.fontWeightMedium,
+                                  color: NothingTheme.nothingBlack,
+                                ),
+                              ),
+                            ),
+                            _buildSafetyBadge(_travelBoxData!),
+                          ],
+                        ),
+                        const SizedBox(height: NothingTheme.spacingSmall),
+                        // 场景信息
+                        _buildSceneInfoRow(_travelBoxData!),
+                        const SizedBox(height: NothingTheme.spacingSmall),
+                        // 建议区块
+                        _buildRecommendationsSection(_travelBoxData!),
+                      ],
+                    ),
+                  ),
+                ),
+
               // 加载指示器
               if (_isAnalyzing)
                 Positioned.fill(
-                  child: Container(
-                    color: NothingTheme.blackAlpha70,
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(NothingTheme.spacingLarge),
-                        decoration: BoxDecoration(
-                          color: NothingTheme.whiteAlpha90,
-                          borderRadius: BorderRadius.circular(NothingTheme.radiusLarge),
-                          boxShadow: NothingTheme.nothingElevatedShadow,
-                          border: Border.all(
-                            color: NothingTheme.yellowAlpha30,
-                            width: 1.5,
+                  child: IgnorePointer(
+                    ignoring: true,
+                    child: Container(
+                      color: NothingTheme.blackAlpha70,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(NothingTheme.spacingLarge),
+                          decoration: BoxDecoration(
+                            color: NothingTheme.whiteAlpha90,
+                            borderRadius: BorderRadius.circular(NothingTheme.radiusLarge),
+                            boxShadow: NothingTheme.nothingElevatedShadow,
+                            border: Border.all(
+                              color: NothingTheme.yellowAlpha30,
+                              width: 1.5,
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(
-                              color: NothingTheme.nothingYellow,
-                              strokeWidth: 3,
-                            ),
-                            const SizedBox(height: NothingTheme.spacingMedium),
-                            Text(
-                              'AI分析中...',
-                              style: TextStyle(
-                                color: NothingTheme.nothingBlack,
-                                fontSize: responsiveFontSize - 2,
-                                fontWeight: NothingTheme.fontWeightMedium,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(
+                                color: NothingTheme.nothingYellow,
+                                strokeWidth: 3,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: NothingTheme.spacingMedium),
+                              Text(
+                                'AI分析中...',
+                                style: TextStyle(
+                                  color: NothingTheme.nothingBlack,
+                                  fontSize: responsiveFontSize - 2,
+                                  fontWeight: NothingTheme.fontWeightMedium,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -637,6 +728,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   }
 
   void _showSnackBar(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -678,8 +770,8 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           // 使用API客户端进行真实分析
           final result = await _apiClient.analyzeImage(imageFile, mode: 'normal');
           setState(() => _result = result);
-          // 分析完成后保存到历史记录
-          await _saveToHistory(imageFile, false);
+          // 分析完成后保存到历史记录（应用置信度阈值过滤）
+          await _saveToHistoryWithThreshold(imageFile, false, result);
           break;
         case Mode.health:
             final healthReport = await _healthAnalyzer.analyzeHealth(imageFile, '未知宠物', '猫');
@@ -690,12 +782,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
               confidence: healthReport.healthAssessment.overallScore,
               subInfo: healthReport.healthAssessment.healthStatus,
             );
-            await _historyManager.addHistory(
-              result: healthResult,
-              mode: _mode.name,
-              imagePath: imageFile.path,
-              isRealtimeAnalysis: false,
-            );
+            await _saveToHistoryWithThreshold(imageFile, false, healthResult);
             break;
           case Mode.pet:
             // 使用API客户端进行宠物分析
@@ -708,24 +795,20 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
               _result = result;
               _petActivity = activity;
             });
-            // 宠物分析完成后保存到历史记录
-            await _saveToHistory(imageFile, false);
+            // 宠物分析完成后保存到历史记录（应用置信度阈值过滤）
+            await _saveToHistoryWithThreshold(imageFile, false, result);
             break;
           case Mode.travel:
-            final travelData = _travelBoxSimulator.getSimulatedAnalysis();
+            // 使用豆包API进行出行场景分析
+            final travelData = await _travelBoxSimulator.analyzeTravelSceneWithApi(imageFile);
             setState(() => _travelBoxData = travelData);
-            // 旅行模式保存到历史记录，使用模拟的AIResult
+            // 旅行模式保存到历史记录，使用真实AIResult
             final travelResult = AIResult(
-              title: '出行箱监控',
-              confidence: 90,
-              subInfo: '电量: ${travelData['batteryLevel'] ?? 85}%',
+              title: '出行场景分析',
+              confidence: travelData['metadata']?['api_response'] != null ? 90 : 60,
+              subInfo: jsonEncode(travelData['metadata']?['api_response'] ?? {'note': '缺少结构化响应'}),
             );
-            await _historyManager.addHistory(
-              result: travelResult,
-              mode: _mode.name,
-              imagePath: imageFile.path,
-              isRealtimeAnalysis: false,
-            );
+            await _saveToHistoryWithThreshold(imageFile, false, travelResult);
             break;
       }
     } catch (e) {
@@ -733,16 +816,62 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     }
   }
 
-  // 保存到历史记录
-  Future<void> _saveToHistory(File imageFile, bool isRealtime) async {
+  // 应用置信度阈值过滤并保存到历史记录
+  Future<void> _saveToHistoryWithThreshold(File imageFile, bool isRealtime, AIResult result) async {
     try {
-      if (_result != null) {
+      // 使用新的置信度管理器
+      final mode = _mode.name;
+      final confidenceMetrics = ConfidenceManager.calculateMetrics(
+         result.confidence,
+         mode,
+         hasApiResponse: result.subInfo?.isNotEmpty ?? false,
+       );
+      
+      debugPrint('🔍 置信度分析: ${confidenceMetrics.toString()}');
+      debugPrint('🔍 保存历史记录检查: 结果置信度=${result.confidence}%, 动态阈值=${confidenceMetrics.threshold}%');
+      
+      // 使用置信度管理器判断是否应该保存
+      if (ConfidenceManager.shouldSaveToHistory(result.confidence, mode)) {
+        // 创建增强的结果，包含置信度建议
+        final enhancedResult = AIResult(
+          title: result.title,
+          confidence: result.confidence,
+          subInfo: '${result.subInfo}\n\n置信度评估: ${confidenceMetrics.advice}',
+        );
+        
         await _historyManager.addHistory(
-          result: _result!,
-          mode: _mode.name,
+          result: enhancedResult,
+          mode: mode,
           imagePath: imageFile.path,
           isRealtimeAnalysis: isRealtime,
         );
+        debugPrint('✅ 分析结果已保存到历史记录: ${result.title} (置信度: ${result.confidence}%, 质量: ${confidenceMetrics.qualityDescription})');
+      } else {
+        // 置信度过低，但仍然保存并添加警告
+        final warningResult = AIResult(
+          title: '${result.title} ⚠️',
+          confidence: result.confidence,
+          subInfo: '${result.subInfo}\n\n⚠️ 置信度警告: ${confidenceMetrics.advice}',
+        );
+        
+        await _historyManager.addHistory(
+          result: warningResult,
+          mode: mode,
+          imagePath: imageFile.path,
+          isRealtimeAnalysis: isRealtime,
+        );
+        debugPrint('⚠️ 分析结果置信度较低但已保存: ${result.title} (置信度: ${result.confidence}%, 质量: ${confidenceMetrics.qualityDescription})');
+      }
+    } catch (e) {
+      debugPrint('保存历史记录失败: $e');
+    }
+  }
+
+  // 保存到历史记录（保留原方法以兼容其他调用）
+  Future<void> _saveToHistory(File imageFile, bool isRealtime) async {
+    try {
+      if (_result != null) {
+        await _saveToHistoryWithThreshold(imageFile, isRealtime, _result!);
       }
     } catch (e) {
       debugPrint('保存历史记录失败: $e');
@@ -755,7 +884,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       return; // Web模式或只有一个摄像头时不切换
     }
 
-    setState(() => _isInitialized = false);
+    // 移除 _isInitialized 赋值
 
     try {
       // 释放当前控制器
@@ -769,7 +898,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       _controller = CameraController(selectedCamera, ResolutionPreset.medium, enableAudio: false);
       await _controller!.initialize();
       
-      setState(() => _isInitialized = true);
+      // 相机切换完成
     } catch (e) {
       _showError('摄像头切换失败: $e');
     }
@@ -806,28 +935,32 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             analysisMessage = '正在分析图像...';
         }
         
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                const SizedBox(width: 12),
-                Text(analysisMessage),
-              ],
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(analysisMessage),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        }
         
         // 分析图像
         await _analyzeImage(image.path);
         
-        setState(() {
-          _isAnalyzing = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isAnalyzing = false;
+          });
+        }
       }
     } catch (e) {
       setState(() {
@@ -1031,33 +1164,37 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     _realtimeAnalyzer.startRealtimeAnalysis(
       controller: _controller!,
       onResult: (result, imageFile) async {
+        // 确保实时分析结果与当前选择的模式一致
+        AIResult modeSpecificResult;
+        
+        switch (_mode) {
+          case Mode.normal:
+            // 使用API客户端进行普通模式分析，确保模式一致性
+            modeSpecificResult = await _apiClient.analyzeImage(imageFile, mode: 'normal');
+            break;
+          case Mode.pet:
+            // 使用API客户端进行宠物模式分析，确保模式一致性
+            modeSpecificResult = await _apiClient.analyzeImage(imageFile, mode: 'pet');
+            break;
+          case Mode.health:
+            // 使用API客户端进行健康模式分析，确保模式一致性
+            modeSpecificResult = await _apiClient.analyzeImage(imageFile, mode: 'health');
+            break;
+          case Mode.travel:
+            // 使用API客户端进行旅行模式分析，确保模式一致性
+            modeSpecificResult = await _apiClient.analyzeImage(imageFile, mode: 'travel');
+            break;
+        }
+        
         setState(() {
-          _result = result;
-          // 根据当前模式设置相应的结果
-          switch (_mode) {
-            case Mode.normal:
-              _result = result;
-              break;
-            case Mode.pet:
-              _result = result;
-              // 可以添加宠物特定的处理逻辑
-              break;
-            case Mode.health:
-              // 可以转换为健康报告格式
-              _result = result;
-              break;
-            case Mode.travel:
-              // 可以转换为旅行数据格式
-              _result = result;
-              break;
-          }
+          _result = modeSpecificResult;
         });
         
-        // 保存实时分析结果到历史记录
-        await _saveToHistory(imageFile, true);
+        // 保存实时分析结果到历史记录（应用置信度阈值过滤）
+        await _saveToHistoryWithThreshold(imageFile, true, modeSpecificResult);
         
         // 显示实时分析结果通知
-        _showSnackBar('实时分析完成: ${result.title}');
+        _showSnackBar('实时分析完成: ${modeSpecificResult.title}');
       },
       onError: (error) {
         _showSnackBar('实时分析错误: $error');
@@ -1066,6 +1203,194 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     );
     
     _showSnackBar('实时分析已启动，每2秒自动分析一次');
+  }
+
+  // 构建安全等级徽章
+  Widget _buildSafetyBadge(Map<String, dynamic> travelData) {
+    final scene = (travelData['scene_analysis'] as Map<String, dynamic>?) ?? {};
+    final String level = (scene['safety_level'] ?? '未知').toString();
+
+    Color color;
+    IconData icon;
+    switch (level) {
+      case '安全':
+        color = Colors.green.shade600;
+        icon = Icons.check_circle_outline;
+        break;
+      case '需注意':
+        color = Colors.orange.shade600;
+        icon = Icons.warning_amber_outlined;
+        break;
+      case '需谨慎':
+        color = Colors.red.shade600;
+        icon = Icons.error_outline;
+        break;
+      default:
+        color = Colors.grey.shade600;
+        icon = Icons.help_outline;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: NothingTheme.spacingSmall,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.6), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            level,
+            style: TextStyle(
+              color: color,
+              fontSize: NothingTheme.fontSizeBody,
+              fontWeight: NothingTheme.fontWeightMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 场景信息行：类型、位置、天气
+  Widget _buildSceneInfoRow(Map<String, dynamic> travelData) {
+    final scene = (travelData['scene_analysis'] as Map<String, dynamic>?) ?? {};
+    final String type = (scene['type'] ?? '未知场景').toString();
+    final String location = (scene['location'] ?? '未知位置').toString();
+    final String weather = (scene['weather'] ?? '未知天气').toString();
+
+    Widget infoChip(IconData icon, String label, String value) {
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: NothingTheme.spacingSmall,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: NothingTheme.whiteAlpha90,
+          borderRadius: BorderRadius.circular(NothingTheme.radiusMedium),
+          border: Border.all(color: NothingTheme.grayAlpha30, width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: NothingTheme.nothingBlack),
+            const SizedBox(width: 6),
+            Text(
+              '$label: $value',
+              style: const TextStyle(
+                color: NothingTheme.nothingBlack,
+                fontSize: NothingTheme.fontSizeCaption,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: NothingTheme.spacingSmall,
+      runSpacing: NothingTheme.spacingSmall,
+      children: [
+        infoChip(Icons.category_outlined, '类型', type),
+        infoChip(Icons.place_outlined, '位置', location),
+        infoChip(Icons.wb_sunny_outlined, '天气', weather),
+      ],
+    );
+  }
+
+  // 建议区块：活动、提示、旅行建议
+  Widget _buildRecommendationsSection(Map<String, dynamic> travelData) {
+    final rec = (travelData['recommendations'] as Map<String, dynamic>?) ?? {};
+    final List<String> activities = List<String>.from(rec['activities'] ?? const []);
+    final List<String> safetyTips = List<String>.from(rec['safety_tips'] ?? const []);
+    final List<String> advice = List<String>.from(rec['travel_advice'] ?? const []);
+
+    Widget sectionTitle(String title, IconData icon) {
+      return Row(
+        children: [
+          Icon(icon, size: 18, color: NothingTheme.nothingBlack),
+          const SizedBox(width: NothingTheme.spacingSmall),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: NothingTheme.fontSizeBody,
+              fontWeight: NothingTheme.fontWeightMedium,
+              color: NothingTheme.nothingBlack,
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget chip(String text) {
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: NothingTheme.spacingSmall,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: NothingTheme.whiteAlpha90,
+          borderRadius: BorderRadius.circular(NothingTheme.radiusMedium),
+          border: Border.all(color: NothingTheme.grayAlpha30, width: 1),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: NothingTheme.nothingBlack,
+            fontSize: NothingTheme.fontSizeCaption,
+          ),
+        ),
+      );
+    }
+
+    Widget emptyHint(String text) => Text(
+          text,
+          style: TextStyle(
+            color: NothingTheme.nothingDarkGray,
+            fontSize: NothingTheme.fontSizeCaption,
+          ),
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        sectionTitle('推荐活动', Icons.directions_walk_outlined),
+        const SizedBox(height: NothingTheme.spacingXSmall),
+        activities.isNotEmpty
+            ? Wrap(
+                spacing: NothingTheme.spacingSmall,
+                runSpacing: NothingTheme.spacingSmall,
+                children: activities.map(chip).toList(),
+              )
+            : emptyHint('暂无活动建议'),
+        const SizedBox(height: NothingTheme.spacingSmall),
+        sectionTitle('安全提示', Icons.shield_outlined),
+        const SizedBox(height: NothingTheme.spacingXSmall),
+        safetyTips.isNotEmpty
+            ? Wrap(
+                spacing: NothingTheme.spacingSmall,
+                runSpacing: NothingTheme.spacingSmall,
+                children: safetyTips.map(chip).toList(),
+              )
+            : emptyHint('暂无安全提示'),
+        const SizedBox(height: NothingTheme.spacingSmall),
+        sectionTitle('旅行建议', Icons.map_outlined),
+        const SizedBox(height: NothingTheme.spacingXSmall),
+        advice.isNotEmpty
+            ? Wrap(
+                spacing: NothingTheme.spacingSmall,
+                runSpacing: NothingTheme.spacingSmall,
+                children: advice.map(chip).toList(),
+              )
+            : emptyHint('暂无旅行建议'),
+      ],
+    );
   }
 
   @override

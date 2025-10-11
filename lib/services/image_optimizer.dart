@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:typed_data';
+
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
@@ -43,40 +43,23 @@ class ImageOptimizer {
       
       // 2. 读取图像数据
       final imageBytes = await imageFile.readAsBytes();
-      final image = img.decodeImage(imageBytes);
-      
-      if (image == null) {
-        debugPrint('❌ 无法解码图像文件');
-        return imageFile;
-      }
-      
-      // 3. 分析图像特征
-      final imageFeatures = _analyzeImageFeatures(image);
-      debugPrint('📊 图像特征分析: ${imageFeatures.toString()}');
-      
-      // 4. 评估网络质量
+
+      // 3. 评估网络质量（主隔离）
       final networkQuality = await _getNetworkQuality();
       debugPrint('📡 网络质量评估: ${networkQuality.toString()}');
       
-      // 5. 计算最优压缩参数
-      final compressionParams = _calculateOptimalCompression(
-        imageFeatures: imageFeatures,
-        networkQuality: networkQuality,
-        originalSize: fileSize,
-        mode: mode,
-      );
-      debugPrint('⚙️ 压缩参数: ${compressionParams.toString()}');
+      // 4. 在后台隔离执行重计算任务（解码+特征分析+压缩）
+      final optimizedBytes = await compute(ImageOptimizer._optimizeImageTask, {
+        'bytes': imageBytes,
+        'fileSize': fileSize,
+        'networkQualityIndex': networkQuality.index,
+        'mode': mode,
+      });
       
-      // 6. 执行图像优化
-      final optimizedImage = await _compressImage(
-        image,
-        compressionParams,
-      );
-      
-      // 7. 保存优化后的图像
+      // 5. 保存优化后的图像
       final optimizedFile = await _saveOptimizedImage(
         imageFile,
-        optimizedImage,
+        optimizedBytes,
       );
       
       final optimizedSize = await optimizedFile.length();
@@ -92,8 +75,71 @@ class ImageOptimizer {
     }
   }
   
+  // 在后台隔离中运行的图像优化任务
+  static Future<Uint8List> _optimizeImageTask(Map<String, dynamic> args) async {
+    try {
+      final Uint8List bytes = args['bytes'] as Uint8List;
+      final int fileSize = args['fileSize'] as int;
+      final int nqIndex = args['networkQualityIndex'] as int;
+      final String? mode = args['mode'] as String?;
+      
+      final image = img.decodeImage(bytes);
+      if (image == null) {
+        // 解码失败，返回原始字节
+        return bytes;
+      }
+      
+      // 分析图像特征
+      final imageFeatures = _analyzeImageFeatures(image);
+      
+      // 计算压缩参数
+      final networkQuality = NetworkQuality.values[nqIndex];
+      var params = _calculateOptimalCompression(
+        imageFeatures: imageFeatures,
+        networkQuality: networkQuality,
+        originalSize: fileSize,
+        mode: mode,
+      );
+      
+      // 执行压缩（迭代确保不超过目标大小）
+      Uint8List optimizedBytes = await _compressImage(image, params);
+      
+      // 如果仍然超过目标大小，则逐步降低质量与分辨率
+      const int minDimension = 640; // 最低分辨率限制
+      while (optimizedBytes.length > _maxFileSizeBytes && params.quality > _minQuality) {
+        // 降低质量
+        final int newQuality = math.max(_minQuality, params.quality - 5);
+        // 按比例降低分辨率（但不低于minDimension）
+        final int newMaxDim = math.max(minDimension, (params.maxDimension * 0.9).round());
+        
+        params = CompressionParams(
+          quality: newQuality,
+          maxDimension: newMaxDim,
+          format: img.JpegEncoder(),
+        );
+        
+        optimizedBytes = await _compressImage(image, params);
+        
+        // 如果质量已到达最低但仍超过大小，继续降低分辨率
+        if (optimizedBytes.length > _maxFileSizeBytes && newQuality == _minQuality && newMaxDim > minDimension) {
+          params = CompressionParams(
+            quality: newQuality,
+            maxDimension: math.max(minDimension, (newMaxDim * 0.9).round()),
+            format: img.JpegEncoder(),
+          );
+          optimizedBytes = await _compressImage(image, params);
+        }
+      }
+      
+      return optimizedBytes;
+    } catch (_) {
+      // 任意异常回退到原始字节
+      return args['bytes'] as Uint8List;
+    }
+  }
+  
   /// 分析图像特征
-  ImageFeatures _analyzeImageFeatures(img.Image image) {
+  static ImageFeatures _analyzeImageFeatures(img.Image image) {
     // 计算图像复杂度
     final complexity = _calculateImageComplexity(image);
     
@@ -114,7 +160,7 @@ class ImageOptimizer {
   }
   
   /// 计算图像复杂度（基于边缘检测）
-  double _calculateImageComplexity(img.Image image) {
+  static double _calculateImageComplexity(img.Image image) {
     // 简化的复杂度计算：基于像素变化程度
     int edgeCount = 0;
     int totalPixels = 0;
@@ -142,7 +188,7 @@ class ImageOptimizer {
   }
   
   /// 检测图像中是否包含文字（简化版）
-  bool _detectText(img.Image image) {
+  static bool _detectText(img.Image image) {
     // 简化的文字检测：基于高对比度区域密度
     int highContrastRegions = 0;
     int totalRegions = 0;
@@ -191,9 +237,8 @@ class ImageOptimizer {
   }
   
   /// 分析图像颜色分布
-  ColorAnalysis _analyzeColors(img.Image image) {
+  static ColorAnalysis _analyzeColors(img.Image image) {
     Map<int, int> colorCounts = {};
-    double totalVariance = 0;
     int pixelCount = 0;
     
     // 采样分析（每4个像素采样一个以提高性能）
@@ -226,7 +271,7 @@ class ImageOptimizer {
   }
   
   /// 量化颜色（减少颜色数量以提高性能）
-  int _quantizeColor(img.Pixel pixel) {
+  static int _quantizeColor(img.Pixel pixel) {
     final r = (pixel.r ~/ 32) * 32;
     final g = (pixel.g ~/ 32) * 32;
     final b = (pixel.b ~/ 32) * 32;
@@ -248,7 +293,7 @@ class ImageOptimizer {
       
       await HttpClient()
           .getUrl(Uri.parse('https://www.baidu.com'))
-          .timeout(const Duration(seconds: 5))
+          .timeout(const Duration(seconds: 1))
           .then((request) => request.close());
       
       stopwatch.stop();
@@ -278,7 +323,7 @@ class ImageOptimizer {
   }
   
   /// 计算最优压缩参数
-  CompressionParams _calculateOptimalCompression({
+  static CompressionParams _calculateOptimalCompression({
     required ImageFeatures imageFeatures,
     required NetworkQuality networkQuality,
     required int originalSize,
@@ -292,14 +337,15 @@ class ImageOptimizer {
     switch (networkQuality) {
       case NetworkQuality.poor:
         quality = math.max(_minQuality, quality - 25);
-        maxDimension = math.min(maxDimension, 1280);
+        maxDimension = math.min(maxDimension, 960); // 进一步降低分辨率以减少体积
         break;
       case NetworkQuality.fair:
         quality = math.max(_minQuality, quality - 15);
-        maxDimension = math.min(maxDimension, 1600);
+        maxDimension = math.min(maxDimension, 1120); // 略降分辨率
         break;
       case NetworkQuality.good:
         quality = math.max(_minQuality, quality - 5);
+        // 保持默认分辨率
         break;
       case NetworkQuality.excellent:
         // 保持高质量
@@ -329,7 +375,7 @@ class ImageOptimizer {
     // 根据原始文件大小调整
     if (originalSize > 10 * 1024 * 1024) { // 10MB以上
       quality = math.max(_minQuality, quality - 15);
-      maxDimension = math.min(maxDimension, 1280);
+      maxDimension = math.min(maxDimension, 960); // 降低分辨率以加速上传
     }
     
     return CompressionParams(
@@ -340,7 +386,7 @@ class ImageOptimizer {
   }
   
   /// 执行图像压缩
-  Future<Uint8List> _compressImage(
+  static Future<Uint8List> _compressImage(
     img.Image image,
     CompressionParams params,
   ) async {
@@ -400,7 +446,7 @@ class ImageFeatures {
   
   @override
   String toString() {
-    return 'ImageFeatures(${width}x${height}, complexity: ${complexity.toStringAsFixed(2)}, hasText: $hasText, colorVariance: ${colorVariance.toStringAsFixed(3)})';
+    return 'ImageFeatures(${width}x$height, complexity: ${complexity.toStringAsFixed(2)}, hasText: $hasText, colorVariance: ${colorVariance.toStringAsFixed(3)})';
   }
 }
 

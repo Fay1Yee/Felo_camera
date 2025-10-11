@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' as io;
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'api_client.dart';
@@ -13,6 +14,7 @@ class Preloader {
   
   Preloader._internal();
   
+  // ignore: unused_field
   final ApiClient _apiClient = ApiClient.instance;
   final net.NetworkManager _networkManager = net.NetworkManager.instance;
   
@@ -84,16 +86,20 @@ class Preloader {
   Future<void> _preloadNetworkConnection() async {
     try {
       debugPrint('🌐 预热网络连接...');
-      
+  
       // 检测网络质量
       final quality = await _networkManager.detectNetworkQuality();
-      
-      // 预热连接池
-      await _networkManager.preWarmConnections([
-        ApiConfig.backendBaseUrl,
-        ApiConfig.doubaoBaseUrl,
-      ]);
-      
+  
+      // 预热连接池（移动端跳过本地后端 localhost）
+      final bool isMobile = io.Platform.isAndroid || io.Platform.isIOS;
+      final bool backendIsLocal = ApiConfig.backendBaseUrl.contains('localhost') || ApiConfig.backendBaseUrl.contains('127.0.0.1');
+      final List<String> hosts = [];
+      if (!isMobile || !backendIsLocal) {
+        hosts.add(ApiConfig.backendBaseUrl);
+      }
+      hosts.add(ApiConfig.doubaoBaseUrl);
+      await _networkManager.preWarmConnections(hosts);
+  
       _preloadStatus['network_connection'] = true;
       debugPrint('✅ 网络连接预热完成，质量: $quality');
     } catch (e) {
@@ -106,13 +112,19 @@ class Preloader {
   Future<void> _preloadApiConnection() async {
     try {
       debugPrint('🔗 预热API连接...');
-      
-      // 发送健康检查请求到后端
-      await _warmupBackendApi();
-      
+  
+      // 移动端且后端为localhost时跳过后端健康检查
+      final bool isMobile = io.Platform.isAndroid || io.Platform.isIOS;
+      final bool backendIsLocal = ApiConfig.backendBaseUrl.contains('localhost') || ApiConfig.backendBaseUrl.contains('127.0.0.1');
+      if (!isMobile || !backendIsLocal) {
+        await _warmupBackendApi();
+      } else {
+        debugPrint('⏭️ 跳过移动端本地后端预热 (${ApiConfig.backendBaseUrl})');
+      }
+  
       // 预热Doubao API连接
       await _warmupDoubaoApi();
-      
+  
       _preloadStatus['api_warmup'] = true;
       debugPrint('✅ API连接预热完成');
     } catch (e) {

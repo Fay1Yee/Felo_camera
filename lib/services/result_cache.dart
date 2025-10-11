@@ -345,8 +345,12 @@ extension AIResultJson on AIResult {
   static AIResult fromJson(Map<String, dynamic> json) {
     return AIResult(
       title: json['title'] ?? '',
-      confidence: (json['confidence'] ?? 0).toDouble(),
-      subInfo: json['subInfo'],
+      confidence: (json['confidence'] ?? 0).toInt(),
+      subInfo: json['subInfo'] == null
+          ? null
+          : (json['subInfo'] is String
+              ? json['subInfo'] as String
+              : jsonEncode(json['subInfo'])),
     );
   }
 }

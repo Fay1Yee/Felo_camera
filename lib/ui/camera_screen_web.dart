@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
 import 'dart:async';
 import 'dart:html' as html;
 import 'dart:io';
@@ -66,7 +67,9 @@ class _CameraScreenState extends State<CameraScreen> {
         debugPrint('清理临时文件失败: $e');
       }
       
+      if (!mounted) return;
       setState(() => _result = res);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('图片上传完成，远程AI分析结果已生成'),
@@ -77,17 +80,21 @@ class _CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       _showError('图片分析失败: $e');
       // 使用错误占位符
+      if (!mounted) return;
       setState(() => _result = const AIResult(
         title: '分析失败', 
         confidence: 0,
         subInfo: '远程API处理出现问题'
       ));
     } finally {
-      setState(() => _isTakingPicture = false);
+      if (mounted) {
+        setState(() => _isTakingPicture = false);
+      }
     }
   }
 
   void _showError(String msg) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),

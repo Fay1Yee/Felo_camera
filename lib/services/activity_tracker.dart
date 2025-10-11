@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import '../models/pet_activity.dart';
-import 'doubao_api_client.dart';
+import 'api_client.dart';
+import 'image_optimizer.dart';
 
 /// 宠物活动追踪器 - 基于图像识别宠物活动
 class ActivityTracker {
@@ -17,13 +17,18 @@ class ActivityTracker {
   
   ActivityTracker._();
 
+  final ImageOptimizer _imageOptimizer = ImageOptimizer.instance;
+
   /// 分析宠物活动
   Future<PetActivity> trackActivity(File imageFile, String petName) async {
     debugPrint('📊 开始活动追踪: $petName');
     
     try {
-      // 读取并解码图像
-      final bytes = await imageFile.readAsBytes();
+      // 优化图像以提升网络传输与AI处理效率
+      final optimizedFile = await _imageOptimizer.optimizeImage(imageFile, mode: 'pet');
+
+      // 读取并解码优化后图像
+      final bytes = await optimizedFile.readAsBytes();
       final image = img.decodeImage(bytes);
       
       if (image == null) {
@@ -31,7 +36,7 @@ class ActivityTracker {
       }
 
       // 分析活动
-      final activity = await _analyzeActivity(image, petName, imageFile.path);
+      final activity = await _analyzeActivity(image, petName, optimizedFile.path);
       
       debugPrint('✅ 活动追踪完成: ${activity.activityType.displayName}');
       return activity;
@@ -49,32 +54,46 @@ class ActivityTracker {
     final petId = '${petName.toLowerCase()}_${timestamp.millisecondsSinceEpoch}';
 
     try {
-      // 将图像转换为字节数组
-      final imageBytes = Uint8List.fromList(img.encodeJpg(image));
-      
-      // 使用豆包API分析活动状况
-      final apiResponse = await DoubaoApiClient.instance.analyzePetActivity(
-        imageBytes, 
-        petName
-      );
-      
-      // 解析API响应
-      Map<String, dynamic> analysisResult;
+      // 统一通过 ApiClient 分析，具备网络失败自动回退
       try {
-        analysisResult = jsonDecode(apiResponse);
+        final ai = await ApiClient.instance.analyzeImage(File(imagePath), mode: 'pet');
+        // 解析 AIResult.subInfo 的结构化 JSON
+        Map<String, dynamic>? analysisResult;
+        if (ai.subInfo != null) {
+          try {
+            analysisResult = jsonDecode(ai.subInfo!);
+          } catch (_) {
+            final extracted = _extractJson(ai.subInfo!);
+            if (extracted != null) {
+              try { analysisResult = jsonDecode(extracted); } catch (_) {}
+            }
+          }
+        }
+
+        if (analysisResult != null) {
+          return _buildActivityFromApi(analysisResult, activityId, timestamp, petName, petId, imagePath);
+        }
       } catch (e) {
-        // 如果JSON解析失败，使用默认分析
-        debugPrint('⚠️ API响应解析失败，使用本地分析: $e');
-        return _generateLocalActivity(image, petName, imagePath);
+        debugPrint('⚠️ 统一API分析失败: $e');
+        return _generateErrorActivity(petName, e.toString());
       }
-      
-      // 基于API结果生成活动报告
-      return _buildActivityFromApi(analysisResult, activityId, timestamp, petName, petId, imagePath);
-      
+
+      // 如果没有结构化结果，返回错误活动，提示豆包响应不符合模式
+      return _generateErrorActivity(petName, '豆包响应缺少结构化JSON');
     } catch (e) {
-      debugPrint('⚠️ API调用失败，使用本地分析: $e');
-      return _generateLocalActivity(image, petName, imagePath);
+      debugPrint('⚠️ 活动分析失败: $e');
+      return _generateErrorActivity(petName, e.toString());
     }
+  }
+
+  /// 从文本中提取JSON片段
+  String? _extractJson(String text) {
+    final start = text.indexOf('{');
+    final end = text.lastIndexOf('}');
+    if (start != -1 && end != -1 && end > start) {
+      return text.substring(start, end + 1);
+    }
+    return null;
   }
 
   /// 基于API结果构建活动报告
@@ -114,6 +133,7 @@ class ActivityTracker {
   }
 
   /// 生成本地活动分析（备用方案）
+  // ignore: unused_element
   Future<PetActivity> _generateLocalActivity(img.Image image, String petName, String imagePath) async {
     final timestamp = DateTime.now();
     final activityId = 'activity_${timestamp.millisecondsSinceEpoch}';
@@ -161,8 +181,6 @@ class ActivityTracker {
 
   /// 分析图像活动特征
   Map<String, dynamic> _analyzeImageForActivity(img.Image image) {
-    final random = math.Random();
-    
     // 分析运动模糊（活动强度指标）
     final motionBlur = _analyzeMotionBlur(image);
     
@@ -223,8 +241,6 @@ class ActivityTracker {
 
   /// 分析姿态
   Map<String, dynamic> _analyzePosture(img.Image image) {
-    final random = math.Random();
-    
     // 简化的姿态分析
     final aspectRatio = image.width / image.height;
     final centerBrightness = _getCenterBrightness(image);
@@ -372,27 +388,27 @@ class ActivityTracker {
     
     switch (activityType) {
       case ActivityType.playing:
-        return '在${location}愉快地玩耍，光线${lightingCondition}';
+        return '在$location愉快地玩耍，光线$lightingCondition';
       case ActivityType.eating:
-        return '在${location}进食，光线${lightingCondition}';
+        return '在$location进食，光线$lightingCondition';
       case ActivityType.sleeping:
-        return '在${location}安静地睡觉，光线${lightingCondition}';
+        return '在$location安静地睡觉，光线$lightingCondition';
       case ActivityType.walking:
-        return '在${location}悠闲地散步，光线${lightingCondition}';
+        return '在$location悠闲地散步，光线$lightingCondition';
       case ActivityType.running:
-        return '在${location}快速奔跑，光线${lightingCondition}';
+        return '在$location快速奔跑，光线$lightingCondition';
       case ActivityType.grooming:
-        return '在${location}进行自我清洁，光线${lightingCondition}';
+        return '在$location进行自我清洁，光线$lightingCondition';
       case ActivityType.training:
-        return '在${location}进行训练活动，光线${lightingCondition}';
+        return '在$location进行训练活动，光线$lightingCondition';
       case ActivityType.socializing:
-        return '在${location}与其他动物或人类互动，光线${lightingCondition}';
+        return '在$location与其他动物或人类互动，光线$lightingCondition';
       case ActivityType.exploring:
-        return '在${location}好奇地探索周围环境，光线${lightingCondition}';
+        return '在$location好奇地探索周围环境，光线$lightingCondition';
       case ActivityType.resting:
-        return '在${location}安静地休息，光线${lightingCondition}';
+        return '在$location安静地休息，光线$lightingCondition';
       case ActivityType.other:
-        return '在${location}进行其他活动，光线${lightingCondition}';
+        return '在$location进行其他活动，光线$lightingCondition';
     }
   }
 

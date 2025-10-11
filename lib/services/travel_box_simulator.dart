@@ -1,11 +1,11 @@
 import 'dart:math';
 import 'dart:ui' as ui;
-import 'dart:typed_data';
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'doubao_api_client.dart';
+import 'api_client.dart';
 
 // 模拟场景类型
 enum SimulatedScene {
@@ -396,28 +396,42 @@ class TravelBoxSimulator {
   /// 使用豆包API分析真实图像的旅行场景
   Future<Map<String, dynamic>> analyzeTravelSceneWithApi(File imageFile) async {
     try {
-      // 读取图像文件
-      final imageBytes = await imageFile.readAsBytes();
-      
-      // 使用豆包API分析场景
-      final apiResponse = await DoubaoApiClient.instance.analyzeTravelScene(imageBytes);
-      
-      // 解析API响应
-      Map<String, dynamic> analysisResult;
-      try {
-        analysisResult = jsonDecode(apiResponse);
-      } catch (e) {
-        debugPrint('⚠️ API响应解析失败，使用模拟分析: $e');
-        return _getRecommendationsForScene();
+      final ai = await ApiClient.instance.analyzeImage(imageFile, mode: 'travel');
+      Map<String, dynamic>? analysis;
+      if (ai.subInfo != null) {
+        try {
+          analysis = jsonDecode(ai.subInfo!);
+        } catch (_) {
+          final extracted = _extractJson(ai.subInfo!);
+          if (extracted != null) {
+            try { analysis = jsonDecode(extracted); } catch (_) {}
+          }
+        }
       }
-      
-      // 转换API结果为应用格式
-      return _convertApiResultToAppFormat(analysisResult);
-      
+
+      if (analysis != null) {
+        // 转换API结果为应用格式
+        return _convertApiResultToAppFormat(analysis);
+      }
+
+      throw StateError('豆包响应缺少结构化JSON');
     } catch (e) {
-      debugPrint('⚠️ API调用失败，使用模拟分析: $e');
-      return _getRecommendationsForScene();
+      debugPrint('⚠️ 出行场景分析失败: $e');
+      return {
+        'error': true,
+        'message': e.toString(),
+      };
     }
+  }
+
+  /// 从文本中提取JSON片段
+  String? _extractJson(String text) {
+    final start = text.indexOf('{');
+    final end = text.lastIndexOf('}');
+    if (start != -1 && end != -1 && end > start) {
+      return text.substring(start, end + 1);
+    }
+    return null;
   }
 
   /// 转换API结果为应用格式
@@ -482,6 +496,7 @@ class TravelBoxSimulator {
   }
 
   /// 获取场景推荐（回退方法）
+  // ignore: unused_element
   Map<String, dynamic> _getRecommendationsForScene() {
     return {
       'scene_analysis': {

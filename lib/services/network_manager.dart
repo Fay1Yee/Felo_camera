@@ -33,6 +33,7 @@ class NetworkManager {
   static const Duration _requestTimeout = Duration(seconds: 10); // 减少请求超时
   
   // 请求合并配置
+  // ignore: unused_field
   static const Duration _requestMergeWindow = Duration(milliseconds: 100);
   
   /// 初始化HTTP客户端
@@ -100,7 +101,7 @@ class NetworkManager {
         } else if (_shouldRetry(response.statusCode, attempt)) {
           attempt++;
           if (attempt < _maxRetries) {
-            debugPrint('🔄 请求失败 (${response.statusCode})，${delay.inMilliseconds}ms后重试 (第${attempt}次)');
+            debugPrint('🔄 请求失败 (${response.statusCode})，${delay.inMilliseconds}ms后重试 (第$attempt次)');
             await Future.delayed(delay);
             delay = _calculateNextDelay(delay, attempt);
           } else {
@@ -118,7 +119,7 @@ class NetworkManager {
         }
         
         if (_shouldRetryException(e)) {
-          debugPrint('🔄 请求异常，${delay.inMilliseconds}ms后重试 (第${attempt}次): $e');
+          debugPrint('🔄 请求异常，${delay.inMilliseconds}ms后重试 (第$attempt次): $e');
           await Future.delayed(delay);
           delay = _calculateNextDelay(delay, attempt);
         } else {
@@ -178,6 +179,7 @@ class NetworkManager {
   }
   
   /// 请求去重和合并
+  // ignore: unused_element
   Future<http.Response> _deduplicateRequest(
     String requestKey,
     Future<http.Response> Function() requestFunction,
@@ -206,6 +208,7 @@ class NetworkManager {
   }
   
   /// 生成请求键（用于去重）
+  // ignore: unused_element
   String _generateRequestKey(String method, Uri url, Map<String, String>? headers) {
     final headerString = headers?.entries
         .map((e) => '${e.key}:${e.value}')

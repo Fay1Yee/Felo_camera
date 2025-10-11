@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.pet_camera_demo"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion // 移除以避免对本机 NDK 的强依赖
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -28,10 +28,10 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         
-        // Nothing Phone 3a 架构优化（主要使用 arm64-v8a）
-        ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
-        }
+        // 移除 abiFilters，避免触发 NDK/CMake 构建路径
+        // ndk {
+        //     abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        // }
         
         // 多dex支持，防止方法数超限
         multiDexEnabled = true
