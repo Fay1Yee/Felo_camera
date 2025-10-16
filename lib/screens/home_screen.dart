@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../ui/camera_screen.dart';
+import '../utils/responsive_helper.dart';
 import 'health_screen.dart';
 import 'reminder_screen.dart';
 import 'history_screen.dart';
@@ -31,7 +31,20 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // 顶部导航栏
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: EdgeInsets.symmetric(
+                horizontal: ResponsiveHelper.getResponsiveSpacing(
+                  context,
+                  mobile: 20,
+                  tablet: 24,
+                  desktop: 32,
+                ),
+                vertical: ResponsiveHelper.getResponsiveSpacing(
+                  context,
+                  mobile: 16,
+                  tablet: 20,
+                  desktop: 24,
+                ),
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFFFFF), // 纯白卡片
                 border: Border(
@@ -50,15 +63,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'Felo Camera',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 20,
+                            tablet: 24,
+                            desktop: 28,
+                          ),
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF37474F), // 深灰文字
                         ),
                       ),
                       Text(
-                        '宠物智能档案',
+                        '我的智能档案',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 12,
+                            tablet: 14,
+                            desktop: 16,
+                          ),
                           color: const Color(0xFF78909C), // 中灰文字
                         ),
                       ),
@@ -70,6 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icon(
                           Icons.notifications_outlined,
                           color: const Color(0xFF90A4AE), // 浅灰辅助
+                          size: ResponsiveHelper.getResponsiveWidth(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            desktop: 32,
+                          ),
                         ),
                         onPressed: () {
                           // TODO: 打开通知页面
@@ -79,6 +108,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icon(
                           Icons.person_outline,
                           color: const Color(0xFF90A4AE), // 浅灰辅助
+                          size: ResponsiveHelper.getResponsiveWidth(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            desktop: 32,
+                          ),
                         ),
                         onPressed: () {
                           Navigator.push(
@@ -121,7 +156,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: ResponsiveHelper.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 24,
+                desktop: 32,
+              ),
+              vertical: ResponsiveHelper.getResponsiveSpacing(
+                context,
+                mobile: 8,
+                tablet: 12,
+                desktop: 16,
+              ),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -158,29 +206,59 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 宠物状态卡片
-          _buildPetStatusCard(),
-          
-          const SizedBox(height: 20),
-          
-          // 今日重点卡片
-          _buildTodayHighlightCard(),
-          
-          const SizedBox(height: 20),
-          
-          // 功能快捷入口
-          _buildQuickActions(),
-          
-          const SizedBox(height: 20),
-          
-          // AI相机按钮
-          _buildAICameraButton(),
-        ],
+    return ResponsiveContainer(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(
+          ResponsiveHelper.getResponsiveSpacing(
+            context,
+            mobile: 20,
+            tablet: 24,
+            desktop: 32,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 宠物状态卡片
+            _buildPetStatusCard(),
+            
+            SizedBox(
+              height: ResponsiveHelper.getResponsiveSpacing(
+                context,
+                mobile: 20,
+                tablet: 24,
+                desktop: 32,
+              ),
+            ),
+            
+            // 今日重点卡片
+            _buildTodayHighlightCard(),
+            
+            SizedBox(
+              height: ResponsiveHelper.getResponsiveSpacing(
+                context,
+                mobile: 20,
+                tablet: 24,
+                desktop: 32,
+              ),
+            ),
+            
+            // 功能快捷入口
+            _buildQuickActions(),
+            
+            SizedBox(
+              height: ResponsiveHelper.getResponsiveSpacing(
+                context,
+                mobile: 20,
+                tablet: 24,
+                desktop: 32,
+              ),
+            ),
+            
+            // AI相机按钮
+            _buildAICameraButton(),
+          ],
+        ),
       ),
     );
   }
@@ -188,10 +266,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPetStatusCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(
+        ResponsiveHelper.getResponsiveSpacing(
+          context,
+          mobile: 20,
+          tablet: 24,
+          desktop: 28,
+        ),
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF), // 纯白卡片
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+          ResponsiveHelper.getResponsiveSpacing(
+            context,
+            mobile: 12,
+            tablet: 16,
+            desktop: 20,
+          ),
+        ),
         border: Border.all(
           color: const Color(0xFFECEFF1), // 浅灰分隔
           width: 1,
@@ -211,36 +303,82 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: ResponsiveHelper.getResponsiveWidth(
+                  context,
+                  mobile: 60,
+                  tablet: 70,
+                  desktop: 80,
+                ),
+                height: ResponsiveHelper.getResponsiveWidth(
+                  context,
+                  mobile: 60,
+                  tablet: 70,
+                  desktop: 80,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFD84D), // 亮黄色
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(
+                    ResponsiveHelper.getResponsiveWidth(
+                      context,
+                      mobile: 30,
+                      tablet: 35,
+                      desktop: 40,
+                    ),
+                  ),
                 ),
                 child: Icon(
                   Icons.pets,
-                  size: 30,
+                  size: ResponsiveHelper.getResponsiveWidth(
+                    context,
+                    mobile: 30,
+                    tablet: 35,
+                    desktop: 40,
+                  ),
                   color: const Color(0xFF37474F), // 深灰文字
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(
+                width: ResponsiveHelper.getResponsiveSpacing(
+                  context,
+                  mobile: 16,
+                  tablet: 20,
+                  desktop: 24,
+                ),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '小白',
+                      '泡泡',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 18,
+                          tablet: 20,
+                          desktop: 22,
+                        ),
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF37474F), // 深灰文字
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(
+                        context,
+                        mobile: 4,
+                        tablet: 6,
+                        desktop: 8,
+                      ),
+                    ),
                     Text(
-                      '田园猫 • 3岁 • 雄性',
+                      '布偶猫 • 2岁 • 雌性',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 14,
+                          tablet: 16,
+                          desktop: 18,
+                        ),
                         color: const Color(0xFF78909C), // 中灰文字
                       ),
                     ),
@@ -248,10 +386,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: ResponsiveHelper.getResponsiveSpacing(
+                    context,
+                    mobile: 8,
+                    tablet: 10,
+                    desktop: 12,
+                  ),
+                  vertical: ResponsiveHelper.getResponsiveSpacing(
+                    context,
+                    mobile: 4,
+                    tablet: 6,
+                    desktop: 8,
+                  ),
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE8F5E9), // 浅绿背景
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    ResponsiveHelper.getResponsiveSpacing(
+                      context,
+                      mobile: 12,
+                      tablet: 14,
+                      desktop: 16,
+                    ),
+                  ),
                   border: Border.all(
                     color: const Color(0xFF4CAF50), // 中绿色
                     width: 1,
@@ -260,7 +418,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(
                   '健康',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(
+                      context,
+                      mobile: 12,
+                      tablet: 14,
+                      desktop: 16,
+                    ),
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF2F5233), // 墨绿色
                   ),
@@ -268,11 +431,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(
+            height: ResponsiveHelper.getResponsiveSpacing(
+              context,
+              mobile: 16,
+              tablet: 20,
+              desktop: 24,
+            ),
+          ),
           // 性格词云
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: ResponsiveHelper.getResponsiveSpacing(
+              context,
+              mobile: 8,
+              tablet: 10,
+              desktop: 12,
+            ),
+            runSpacing: ResponsiveHelper.getResponsiveSpacing(
+              context,
+              mobile: 8,
+              tablet: 10,
+              desktop: 12,
+            ),
             children: [
               _buildPersonalityTag('温柔', false),
               _buildPersonalityTag('聪明伶俐', true),
@@ -290,17 +470,39 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPersonalityTag(String text, bool isYellow, {bool isLarge = false}) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isLarge ? 12 : 8,
-        vertical: isLarge ? 8 : 4,
+        horizontal: ResponsiveHelper.getResponsiveSpacing(
+          context,
+          mobile: isLarge ? 12 : 8,
+          tablet: isLarge ? 14 : 10,
+          desktop: isLarge ? 16 : 12,
+        ),
+        vertical: ResponsiveHelper.getResponsiveSpacing(
+          context,
+          mobile: isLarge ? 8 : 4,
+          tablet: isLarge ? 10 : 6,
+          desktop: isLarge ? 12 : 8,
+        ),
       ),
       decoration: BoxDecoration(
         color: isYellow ? const Color(0xFFFFF8E1) : const Color(0xFFF5F5F0), // 浅黄/浅米色
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          ResponsiveHelper.getResponsiveSpacing(
+            context,
+            mobile: 16,
+            tablet: 18,
+            desktop: 20,
+          ),
+        ),
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: isLarge ? 16 : 12,
+          fontSize: ResponsiveHelper.getResponsiveFontSize(
+            context,
+            mobile: isLarge ? 16 : 12,
+            tablet: isLarge ? 18 : 14,
+            desktop: isLarge ? 20 : 16,
+          ),
           fontWeight: isLarge ? FontWeight.w600 : FontWeight.w500,
           color: isYellow ? const Color(0xFF37474F) : const Color(0xFF78909C),
         ),
@@ -311,10 +513,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTodayHighlightCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(
+        ResponsiveHelper.getResponsiveSpacing(
+          context,
+          mobile: 20,
+          tablet: 24,
+          desktop: 28,
+        ),
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8E1), // 浅黄卡片
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+          ResponsiveHelper.getResponsiveSpacing(
+            context,
+            mobile: 12,
+            tablet: 16,
+            desktop: 20,
+          ),
+        ),
         border: Border.all(
           color: const Color(0xFFFFD84D), // 亮黄色
           width: 1,
@@ -326,29 +542,70 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: ResponsiveHelper.getResponsiveWidth(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
+                ),
+                height: ResponsiveHelper.getResponsiveWidth(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFD84D), // 亮黄色
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(
+                    ResponsiveHelper.getResponsiveWidth(
+                      context,
+                      mobile: 4,
+                      tablet: 5,
+                      desktop: 6,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(
+                width: ResponsiveHelper.getResponsiveSpacing(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
+                ),
+              ),
               Text(
-                '今日重点',
+                '我今天的表现',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(
+                    context,
+                    mobile: 16,
+                    tablet: 18,
+                    desktop: 20,
+                  ),
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF37474F), // 深灰文字
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(
+            height: ResponsiveHelper.getResponsiveSpacing(
+              context,
+              mobile: 12,
+              tablet: 16,
+              desktop: 20,
+            ),
+          ),
           Text(
-            '小白今天表现很棒！已完成晨间散步，食欲正常，情绪活跃。记得下午给它补充水分哦～',
+            '我今天表现很棒！已经完成了晨间散步，食欲正常，情绪很活跃。主人记得下午给我补充水分哦～',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                context,
+                mobile: 14,
+                tablet: 16,
+                desktop: 18,
+              ),
               color: const Color(0xFF37474F), // 深灰文字
               height: 1.5,
             ),
@@ -376,8 +633,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.favorite,
-                title: '健康管理',
-                subtitle: '体检记录',
+                title: '我的健康管理',
+                subtitle: '我的体检记录',
                 color: const Color(0xFF2F5233), // 墨绿色
                 backgroundColor: const Color(0xFFE8F5E9), // 浅绿背景
                 onTap: () => _onItemTapped(1),
@@ -387,8 +644,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.flight_takeoff,
-                title: '出行工具',
-                subtitle: '旅行助手',
+                title: '我的出行工具',
+                subtitle: '我的旅行助手',
                 color: const Color(0xFF37474F), // 深灰文字
                 backgroundColor: const Color(0xFFFFF8E1), // 浅黄背景
                 onTap: () {
@@ -404,8 +661,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.person,
-                title: '宠物档案',
-                subtitle: '详细信息',
+                title: '我的档案',
+                subtitle: '我的详细信息',
                 color: const Color(0xFF78909C), // 中灰文字
                 backgroundColor: const Color(0xFFFFFFFF), // 白色背景
                 onTap: () {
@@ -420,8 +677,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.history,
-                title: '生活记录',
-                subtitle: '成长轨迹',
+                title: '我的生活记录',
+                subtitle: '我的成长轨迹',
                 color: const Color(0xFF78909C), // 中灰文字
                 backgroundColor: const Color(0xFFFFFFFF), // 白色背景
                 onTap: () => _onItemTapped(3),

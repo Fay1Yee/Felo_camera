@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pet_camera_demo"
+    namespace = "com.smartcamera.pet_assistant"
     compileSdk = flutter.compileSdkVersion
     // ndkVersion = flutter.ndkVersion // 移除以避免对本机 NDK 的强依赖
 
@@ -23,7 +23,7 @@ android {
         // 智能相机助手应用ID
         applicationId = "com.smartcamera.pet_assistant"
         // Nothing Phone 3a 优化配置
-        minSdk = 24  // Android 7.0+，支持现代相机API
+        minSdk = 26  // Android 8.0+，支持doc_text插件和现代相机API
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../models/ai_result.dart';
 import '../config/api_config.dart';
@@ -46,8 +48,8 @@ class ApiClient {
   }
 
   /// 分析图像 - 强制通过API调用实现
-  Future<AIResult> analyzeImage(File imageFile, {String mode = 'normal'}) async {
-    debugPrint('🔍 API客户端开始图像分析: ${imageFile.path}, 模式: $mode');
+  Future<AIResult> analyzeImage(File imageFile, {String mode = 'normal', String? modelKey}) async {
+    debugPrint('🔍 API客户端开始图像分析: ${imageFile.path}, 模式: $mode, 模型: ${modelKey ?? 'default'}');
     
     try {
       // 1. 检查缓存
@@ -63,8 +65,8 @@ class ApiClient {
         mode: mode,
       );
       
-      // 3. 强制使用真正的豆包API调用，不使用本地AI或后端回退
-      final result = await _analyzeImageViaAPI(optimizedFile, mode);
+      // 3. 强制使用真正的豆包API调用，支持多模型
+      final result = await _analyzeImageViaAPI(optimizedFile, mode, modelKey);
       
       // 4. 缓存结果
       await _resultCache.cacheResult(imageFile, mode, result);
@@ -75,12 +77,33 @@ class ApiClient {
     } catch (e) {
       debugPrint('❌ 远程API分析失败: $e');
       
+      // 如果主模型失败，尝试备用模型
+      if (modelKey == null || modelKey == ApiConfig.defaultModelKey) {
+        final availableModels = ApiConfig.getAvailableModels();
+        for (final backupModel in availableModels) {
+          if (backupModel != ApiConfig.defaultModelKey) {
+            try {
+              debugPrint('🔄 尝试备用模型: $backupModel');
+              final optimizedFile = await _imageOptimizer.optimizeImage(imageFile, mode: mode);
+              final result = await _analyzeImageViaAPI(optimizedFile, mode, backupModel);
+              await _resultCache.cacheResult(imageFile, mode, result);
+              debugPrint('✅ 备用模型分析成功: ${result.title}');
+              return result;
+            } catch (backupError) {
+              debugPrint('❌ 备用模型 $backupModel 也失败: $backupError');
+              continue;
+            }
+          }
+        }
+      }
+      
       // 使用新的错误处理系统
       final error = ErrorHandler.instance.analyzeException(
         e,
         context: '图像分析',
         additionalContext: {
           'mode': mode,
+          'modelKey': modelKey,
           'imagePath': imageFile.path,
         },
       );
@@ -100,67 +123,88 @@ class ApiClient {
       rethrow;
     }
   }
-  
-  /// 通过真正的API调用分析图像（仅豆包）
-  Future<AIResult> _analyzeImageViaAPI(File imageFile, String mode) async {
-    // 移动端优先且仅使用豆包API，避免任何本地或后端回退
-    return await _analyzeImageViaDoubao(imageFile, mode);
+
+  /// 分析历史记录
+  Future<AIResult> analyzeHistoryRecord(File imageFile, String title, String description) async {
+    final stopwatch = Stopwatch()..start();
+    
+    try {
+      // 使用后端的历史分析API，发送multipart/form-data请求
+      final uri = Uri.parse('${ApiConfig.backendBaseUrl}/analyze-history');
+      final request = http.MultipartRequest('POST', uri);
+      
+      // 添加文件
+      final multipartFile = await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+      
+      // 添加表单字段
+      request.fields['title'] = title;
+      request.fields['description'] = description;
+      
+      // 发送请求
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 15));
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      stopwatch.stop();
+      _performanceMonitor.recordApiCall(
+        endpoint: 'analyze-history',
+        responseTime: stopwatch.elapsed,
+        isSuccess: response.statusCode == 200,
+        statusCode: response.statusCode,
+        dataSize: response.body.length,
+      );
+      
+      if (response.statusCode != 200) {
+        throw Exception('历史记录分析API请求失败: ${response.statusCode} - ${response.body}');
+      }
+      
+      final responseData = jsonDecode(response.body);
+      
+      return AIResult(
+        title: responseData['title'] ?? '历史记录分析',
+        confidence: responseData['confidence'] ?? 75,
+        subInfo: responseData['analysis'] ?? '分析完成',
+      );
+    } catch (e) {
+      stopwatch.stop();
+      _performanceMonitor.recordApiCall(
+        endpoint: 'analyze-history',
+        responseTime: stopwatch.elapsed,
+        isSuccess: false,
+        statusCode: 0,
+        errorMessage: e.toString(),
+      );
+      
+      debugPrint('🚨 历史记录分析错误: $e');
+      rethrow;
+    }
   }
 
-  /// 直接通过豆包API分析图像
-  Future<AIResult> _analyzeImageViaDoubao(File imageFile, String mode) async {
+  /// 分析文本内容（用于文档解析和时间轴生成）
+  Future<String> analyzeText(String text, String systemPrompt) async {
     final stopwatch = Stopwatch()..start();
-    const endpoint = 'doubao_analyze';
+    const endpoint = 'analyze-document';
+    
+    debugPrint('🤖 调用后端文档解析API: $endpoint');
 
     try {
-      // 读取图像并编码为 base64 data URL
-      final imageBytes = await imageFile.readAsBytes();
-      final base64Image = base64Encode(imageBytes);
-      final imageUrl = 'data:image/jpeg;base64,$base64Image';
-
-      // 根据模式设定提示词，严格要求纯JSON输出
-      String prompt;
-      switch (mode) {
-        case 'pet':
-          prompt = '你是宠物行为与识别专家。严格基于图片分析宠物信息（品种、行为、环境、健康线索），并以严格的JSON输出，包含 title（字符串）、confidence（0-100的整数）、subInfo（字符串，内部可嵌入结构化JSON文本，但最终响应只返回最外层JSON）。仅返回纯JSON，不要额外文本。';
-          break;
-        case 'health':
-          prompt = '你是宠物健康评估专家。严格基于图片分析健康状况、风险与建议，并以严格的JSON输出，包含 title（字符串）、confidence（0-100的整数）、subInfo（字符串，内部可嵌入结构化JSON文本，但最终响应只返回最外层JSON）。仅返回纯JSON，不要额外文本。';
-          break;
-        case 'travel':
-          prompt = '你是出行场景分析专家。严格基于图片分析出行相关场景与安全提示，并以严格的JSON输出，包含 title（字符串）、confidence（0-100的整数）、subInfo（字符串，内部可嵌入结构化JSON文本，但最终响应只返回最外层JSON）。仅返回纯JSON，不要额外文本。';
-          break;
-        default:
-          prompt = '严格基于图片进行通用分析，并以严格的JSON输出，包含 title、confidence、subInfo 三个字段。仅返回纯JSON，不要额外文本。';
-      }
-
       final requestBody = {
-        'model': ApiConfig.doubaoModel,
-        'messages': [
-          {
-            'role': 'system',
-            'content': [
-              { 'type': 'text', 'text': ApiConfig.systemPromptStyle }
-            ]
-          },
-          {
-            'role': 'user',
-            'content': [
-              { 'type': 'image_url', 'image_url': { 'url': imageUrl } },
-              { 'type': 'text', 'text': prompt }
-            ]
-          }
-        ],
-        'max_tokens': ApiConfig.defaultMaxTokens,
-        'temperature': ApiConfig.defaultTemperature,
+        'prompt': text,
+        'analysis_type': 'document_timeline'
       };
 
-      // 发送豆包API请求
+      // 调用我们的后端API
       final response = await _networkManager.post(
-        Uri.parse(ApiConfig.getChatCompletionsUrl()),
-        headers: ApiConfig.getHeaders(),
+        Uri.parse('${ApiConfig.backendBaseUrl}/$endpoint'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(requestBody),
-        timeout: const Duration(seconds: 12),
+        timeout: const Duration(seconds: 60), // 增加超时时间到60秒
       );
 
       stopwatch.stop();
@@ -173,55 +217,104 @@ class ApiClient {
       );
 
       if (response.statusCode != 200) {
-        throw Exception('豆包API请求失败: ${response.statusCode} - ${response.body}');
+        throw Exception('后端文本分析API请求失败: ${response.statusCode} - ${response.body}');
       }
 
       final responseData = jsonDecode(response.body);
-      final content = responseData['choices'][0]['message']['content'];
+      final content = responseData['result'];
+      
+      debugPrint('🔍 后端文本分析API响应: ${content.substring(0, content.length > 200 ? 200 : content.length)}...');
+      
+      return content;
+    } catch (e) {
+      stopwatch.stop();
+      _performanceMonitor.recordApiCall(
+        endpoint: endpoint,
+        responseTime: stopwatch.elapsed,
+        isSuccess: false,
+        statusCode: 0,
+        errorMessage: e.toString(),
+      );
+      
+      // 使用错误处理系统分析API调用错误
+      final error = ErrorHandler.instance.analyzeException(
+        e,
+        context: '文本分析API调用',
+        additionalContext: {
+          'endpoint': endpoint,
+          'textLength': text.length,
+        },
+      );
+      
+      debugPrint('🚨 文本分析API调用错误: ${error.type} - ${error.severity}');
+      rethrow;
+    }
+  }
 
-      // 尝试解析为纯JSON
-      try {
-        final parsed = jsonDecode(content);
-        final confidence = parsed['confidence'];
+  /// 通过真正的API调用分析图像（仅豆包）
+  Future<AIResult> _analyzeImageViaAPI(File imageFile, String mode, [String? modelKey]) async {
+    // 移动端优先且仅使用豆包API，避免任何本地或后端回退
+    return await _analyzeImageViaDoubao(imageFile, mode, modelKey);
+  }
+
+  /// 通过后端代理分析图像（修复Web环境下的认证问题）
+  Future<AIResult> _analyzeImageViaDoubao(File imageFile, String mode, [String? modelKey]) async {
+    final stopwatch = Stopwatch()..start();
+    const endpoint = 'analyze';
+    
+    debugPrint('🤖 通过后端代理分析图像，模式: $mode');
+
+    try {
+      // 使用后端的分析API，发送multipart/form-data请求
+      final uri = Uri.parse('${ApiConfig.backendBaseUrl}/$endpoint');
+      final request = http.MultipartRequest('POST', uri);
+      
+      // 添加文件
+      final multipartFile = await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+      
+      // 添加模式参数
+      request.fields['mode'] = mode;
+      
+      // 发送请求
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 15));
+      final response = await http.Response.fromStream(streamedResponse);
+
+      stopwatch.stop();
+      _performanceMonitor.recordApiCall(
+        endpoint: endpoint,
+        responseTime: stopwatch.elapsed,
+        isSuccess: response.statusCode == 200,
+        statusCode: response.statusCode,
+        dataSize: response.body.length,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('后端API请求失败: ${response.statusCode} - ${response.body}');
+      }
+
+      final responseData = jsonDecode(response.body);
+      
+      // 解析后端返回的数据结构
+      if (responseData['success'] == true && responseData['analysis'] != null) {
+        final analysis = responseData['analysis'];
         
         // 使用强化的置信度解析
-        int confidenceValue = _parseConfidenceRobustly(confidence, 'normal');
+        int confidenceValue = _parseConfidenceRobustly(analysis['confidence'], mode);
         
-        debugPrint('🔍 API响应解析: title=${parsed['title']}, confidence=$confidenceValue');
+        debugPrint('🔍 后端API响应解析: title=${analysis['title']}, confidence=$confidenceValue');
         
         return AIResult(
-          title: parsed['title'] ?? '图像分析结果',
+          title: analysis['title'] ?? '图像分析结果',
           confidence: confidenceValue,
-          subInfo: parsed['subInfo'] == null
-              ? content
-              : (parsed['subInfo'] is String
-                  ? parsed['subInfo']
-                  : jsonEncode(parsed['subInfo'])),
+          subInfo: analysis['sub_info'] ?? analysis['description'] ?? '分析完成',
         );
-      } catch (parseError) {
-        debugPrint('⚠️ JSON解析失败: $parseError, 原始内容: $content');
-        // 如果不是纯JSON，尝试提取JSON片段
-        final extracted = _extractJson(content);
-        if (extracted != null) {
-          final parsed = jsonDecode(extracted);
-          final confidence = parsed['confidence'];
-          
-          // 使用强化的置信度解析
-          int confidenceValue = _parseConfidenceRobustly(confidence, 'normal');
-          
-          debugPrint('🔍 提取JSON解析: title=${parsed['title']}, confidence=$confidenceValue');
-          
-          return AIResult(
-            title: parsed['title'] ?? '图像分析结果',
-            confidence: confidenceValue,
-            subInfo: parsed['subInfo'] == null
-                ? extracted
-                : (parsed['subInfo'] is String
-                    ? parsed['subInfo']
-                    : jsonEncode(parsed['subInfo'])),
-          );
-        }
-        throw Exception('豆包响应未按要求返回纯JSON: $content');
+      } else {
+        throw Exception('后端返回格式错误: $responseData');
       }
     } catch (e) {
       stopwatch.stop();
@@ -236,14 +329,14 @@ class ApiClient {
       // 使用错误处理系统分析API调用错误
       final error = ErrorHandler.instance.analyzeException(
         e,
-        context: 'API调用',
+        context: '后端代理API调用',
         additionalContext: {
           'endpoint': endpoint,
           'mode': mode,
         },
       );
       
-      debugPrint('🚨 API调用错误分析: ${error.type} - ${error.severity}');
+      debugPrint('🚨 后端代理API调用错误分析: ${error.type} - ${error.severity}');
       rethrow;
     }
   }

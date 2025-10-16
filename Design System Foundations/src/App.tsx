@@ -19,6 +19,7 @@ import { NotificationSettingsTemplate } from './components/templates/Notificatio
 import { PetProfileDetailTemplate } from './components/templates/PetProfileDetailTemplate';
 import { TravelPlanDetailTemplate } from './components/templates/TravelPlanDetailTemplate';
 import { LifeRecordsTemplate } from './components/templates/LifeRecordsTemplate';
+import { OptimizedLifeRecordsTemplate } from './components/templates/OptimizedLifeRecordsTemplate';
 import { DataBackupTemplate } from './components/templates/DataBackupTemplate';
 import { HabitsDetailTemplate } from './components/templates/HabitsDetailTemplate';
 import { TravelBoxWiFiTemplate } from './components/templates/TravelBoxWiFiTemplate';
@@ -32,7 +33,7 @@ import { PhoneHomeIndicator } from './components/PhoneHomeIndicator';
 // Icons
 import { Home, User, Camera, Box, UserCircle, ArrowLeft, Plus } from 'lucide-react';
 
-type PageType = 'home' | 'scenarios' | 'travel-hub' | 'pet-profile-detail' | 'settings' | 'create-profile' | 'pet-registration' | 'health' | 'reminder' | 'camera-test' | 'health-detail' | 'travel-box-settings' | 'notification-settings' | 'travel-plan-detail' | 'life-records' | 'data-backup' | 'habits-detail' | 'travel-box-wifi' | 'travel-box-bluetooth' | 'travel-box-temperature' | 'travel-box-sound' | 'travel-box-fan';
+type PageType = 'home' | 'scenarios' | 'travel-hub' | 'pet-profile-detail' | 'settings' | 'create-profile' | 'pet-registration' | 'health' | 'reminder' | 'camera-test' | 'health-detail' | 'travel-box-settings' | 'notification-settings' | 'travel-plan-detail' | 'life-records' | 'optimized-life-records' | 'data-backup' | 'habits-detail' | 'travel-box-wifi' | 'travel-box-bluetooth' | 'travel-box-temperature' | 'travel-box-sound' | 'travel-box-fan';
 
 export type ScenarioType = 'travel' | 'home' | 'medical' | 'city';
 
@@ -150,6 +151,12 @@ export default function App() {
       title: '生活记录',
       subtitle: '照片与活动',
       component: LifeRecordsTemplate,
+      parentPage: 'home'
+    },
+    'optimized-life-records': {
+      title: '优化生活记录',
+      subtitle: '文件上传与管理',
+      component: OptimizedLifeRecordsTemplate,
       parentPage: 'home'
     },
     'data-backup': {

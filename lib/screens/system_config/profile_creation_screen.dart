@@ -245,9 +245,7 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen>
           Row(
             children: ProfileCreationStep.values.asMap().entries.map((entry) {
               final index = entry.key;
-              final step = entry.value;
               final isActive = index <= _currentStepIndex;
-              final isCurrent = index == _currentStepIndex;
               
               return Expanded(
                 child: Row(

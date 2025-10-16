@@ -9,13 +9,25 @@ import 'api_client.dart';
 
 // 模拟场景类型
 enum SimulatedScene {
+  // 原有场景
   petSleeping,
   petEating,
   petPlaying,
   petLookingOut,
   empty,
   petHiding,
-  petRestless
+  petRestless,
+  
+  // 新增文档标准分类场景
+  petObserving,    // 观望
+  petExploring,    // 探索
+  petOccupying,    // 领地
+  petAttacking,    // 攻击
+  petNeutral,      // 中性
+  
+  // 新增程序现有分类场景
+  petGrooming,     // 美容护理
+  petRunning,      // 奔跑
 }
 
 /// 出行箱模拟器 - 生成模拟的出行箱摄像头画面
@@ -35,6 +47,7 @@ class TravelBoxSimulator {
   /// 获取当前模拟场景描述
   String getCurrentSceneDescription() {
     switch (_currentScene) {
+      // 原有场景
       case SimulatedScene.petSleeping:
         return '宠物正在安静地睡觉';
       case SimulatedScene.petEating:
@@ -49,6 +62,24 @@ class TravelBoxSimulator {
         return '宠物躲在角落里';
       case SimulatedScene.petRestless:
         return '宠物显得有些不安';
+      
+      // 新增文档标准分类场景
+      case SimulatedScene.petObserving:
+        return '宠物正在观望周围环境';
+      case SimulatedScene.petExploring:
+        return '宠物正在探索新环境';
+      case SimulatedScene.petOccupying:
+        return '宠物正在占据领地位置';
+      case SimulatedScene.petAttacking:
+        return '宠物表现出攻击性行为';
+      case SimulatedScene.petNeutral:
+        return '宠物处于中性状态';
+      
+      // 新增程序现有分类场景
+      case SimulatedScene.petGrooming:
+        return '宠物正在进行美容护理';
+      case SimulatedScene.petRunning:
+        return '宠物正在奔跑';
     }
   }
 
@@ -159,6 +190,7 @@ class TravelBoxSimulator {
 
   Color _getBackgroundColor() {
     switch (_currentScene) {
+      // 原有场景
       case SimulatedScene.petSleeping:
         return const Color(0xFF2D2D2D); // 深灰色
       case SimulatedScene.petEating:
@@ -167,8 +199,28 @@ class TravelBoxSimulator {
         return const Color(0xFF4D4D4D); // 浅灰色
       case SimulatedScene.empty:
         return const Color(0xFF1D1D1D); // 很深的灰色
-      default:
+      case SimulatedScene.petLookingOut:
+      case SimulatedScene.petHiding:
+      case SimulatedScene.petRestless:
         return const Color(0xFF3D3D3D);
+      
+      // 新增文档标准分类场景
+      case SimulatedScene.petObserving:
+        return const Color(0xFF4A4A4A); // 观望时的背景
+      case SimulatedScene.petExploring:
+        return const Color(0xFF5A5A5A); // 探索时的背景
+      case SimulatedScene.petOccupying:
+        return const Color(0xFF3A3A3A); // 领地时的背景
+      case SimulatedScene.petAttacking:
+        return const Color(0xFF6A2A2A); // 攻击时的红色背景
+      case SimulatedScene.petNeutral:
+        return const Color(0xFF3D3D3D); // 中性背景
+      
+      // 新增程序现有分类场景
+      case SimulatedScene.petGrooming:
+        return const Color(0xFF4D4D5D); // 美容护理时的背景
+      case SimulatedScene.petRunning:
+        return const Color(0xFF5D4D4D); // 奔跑时的背景
     }
   }
 
@@ -288,6 +340,99 @@ class TravelBoxSimulator {
           paint,
         );
         break;
+        
+      // 新增文档标准分类场景
+      case SimulatedScene.petObserving:
+        // 观望状态的宠物
+        paint.color = const Color(0xFF8B4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.3, size.height * 0.4),
+            width: 85,
+            height: 110,
+          ),
+          paint,
+        );
+        break;
+        
+      case SimulatedScene.petExploring:
+        // 探索状态的宠物
+        paint.color = const Color(0xFF8B4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.5, size.height * 0.5),
+            width: 95,
+            height: 85,
+          ),
+          paint,
+        );
+        break;
+        
+      case SimulatedScene.petOccupying:
+        // 占据领地的宠物
+        paint.color = const Color(0xFF8B4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.5, size.height * 0.6),
+            width: 120,
+            height: 100,
+          ),
+          paint,
+        );
+        break;
+        
+      case SimulatedScene.petAttacking:
+        // 攻击状态的宠物
+        paint.color = const Color(0xFFAA4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.4, size.height * 0.4),
+            width: 100,
+            height: 120,
+          ),
+          paint,
+        );
+        break;
+        
+      case SimulatedScene.petNeutral:
+        // 中性状态的宠物
+        paint.color = const Color(0xFF8B4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.5, size.height * 0.6),
+            width: 90,
+            height: 90,
+          ),
+          paint,
+        );
+        break;
+        
+      // 新增程序现有分类场景
+      case SimulatedScene.petGrooming:
+        // 美容护理状态的宠物
+        paint.color = const Color(0xFF8B4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.4, size.height * 0.5),
+            width: 85,
+            height: 95,
+          ),
+          paint,
+        );
+        break;
+        
+      case SimulatedScene.petRunning:
+        // 奔跑状态的宠物
+        paint.color = const Color(0xFF8B4513);
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(size.width * 0.6, size.height * 0.4),
+            width: 110,
+            height: 75,
+          ),
+          paint,
+        );
+        break;
     }
   }
 
@@ -342,6 +487,7 @@ class TravelBoxSimulator {
 
   Map<String, dynamic> _getPetStatus() {
     switch (_currentScene) {
+      // 原有场景
       case SimulatedScene.petSleeping:
         return {
           'activity': 'resting',
@@ -370,12 +516,79 @@ class TravelBoxSimulator {
           'comfort': 'low',
           'health_indicators': ['anxious', 'unsettled']
         };
-      default:
+      case SimulatedScene.petLookingOut:
         return {
-          'activity': 'calm',
+          'activity': 'observing',
           'stress_level': 'medium',
           'comfort': 'medium',
-          'health_indicators': ['stable']
+          'health_indicators': ['alert', 'curious']
+        };
+      case SimulatedScene.empty:
+        return {
+          'activity': 'no_pet',
+          'stress_level': 'none',
+          'comfort': 'none',
+          'health_indicators': ['no_pet_detected']
+        };
+      case SimulatedScene.petHiding:
+        return {
+          'activity': 'hiding',
+          'stress_level': 'high',
+          'comfort': 'low',
+          'health_indicators': ['stressed', 'seeking_shelter']
+        };
+      
+      // 新增文档标准分类场景
+      case SimulatedScene.petObserving:
+        return {
+          'activity': 'observe',
+          'stress_level': 'low',
+          'comfort': 'medium',
+          'health_indicators': ['alert', 'watchful', 'focused']
+        };
+      case SimulatedScene.petExploring:
+        return {
+          'activity': 'explore',
+          'stress_level': 'low',
+          'comfort': 'high',
+          'health_indicators': ['curious', 'active', 'investigating']
+        };
+      case SimulatedScene.petOccupying:
+        return {
+          'activity': 'occupy',
+          'stress_level': 'low',
+          'comfort': 'high',
+          'health_indicators': ['territorial', 'confident', 'settled']
+        };
+      case SimulatedScene.petAttacking:
+        return {
+          'activity': 'attack',
+          'stress_level': 'high',
+          'comfort': 'low',
+          'health_indicators': ['aggressive', 'defensive', 'aroused']
+        };
+      case SimulatedScene.petNeutral:
+        return {
+          'activity': 'neutral',
+          'stress_level': 'low',
+          'comfort': 'medium',
+          'health_indicators': ['calm', 'stable', 'neutral']
+        };
+      
+      // 新增程序现有分类场景
+      case SimulatedScene.petGrooming:
+        return {
+          'activity': 'grooming',
+          'stress_level': 'low',
+          'comfort': 'high',
+          'health_indicators': ['self_care', 'relaxed', 'healthy']
+        };
+      case SimulatedScene.petRunning:
+        return {
+          'activity': 'running',
+          'stress_level': 'medium',
+          'comfort': 'medium',
+          'health_indicators': ['energetic', 'active', 'exercising']
         };
     }
   }

@@ -1,0 +1,8 @@
+2024-01-15T14:30:00	sleeping	0.95	{"reasons": "宠物在睡垫上安静休息，呼吸平稳", "location": "客厅", "duration": "2小时"}
+2024-01-15T15:45:00	playing	0.88	{"reasons": "宠物正在玩玩具球，表现活跃", "location": "客厅", "energy": "高"}
+2024-01-15T16:20:00	feeding	0.92	{"reasons": "宠物在食盆旁进食，食欲良好", "location": "厨房", "food_type": "干粮"}
+2024-01-15T17:10:00	grooming	0.85	{"reasons": "宠物正在自我清洁，舔毛行为", "location": "阳台", "behavior": "正常"}
+2024-01-15T18:00:00	exploring	0.78	{"reasons": "宠物在房间内探索，嗅闻各处", "location": "卧室", "curiosity": "高"}
+2024-01-15T19:30:00	resting	0.90	{"reasons": "宠物趴在沙发上休息，眼睛半闭", "location": "客厅", "comfort": "舒适"}
+2024-01-15T20:15:00	drinking	0.87	{"reasons": "宠物在水盆旁饮水，补充水分", "location": "厨房", "water_intake": "正常"}
+2024-01-15T21:00:00	playing	0.83	{"reasons": "宠物与主人互动玩耍，摇尾巴", "location": "客厅", "interaction": "积极"}

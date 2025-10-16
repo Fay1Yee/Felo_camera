@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'widgets/phone_status_bar.dart';
+import 'services/history_manager.dart';
+import 'models/ai_result.dart';
+import 'models/analysis_history.dart';
 
 import 'screens/today_screen.dart';
 import 'screens/profile_screen.dart';
@@ -27,6 +30,83 @@ class _MainAppState extends State<MainApp> {
   ];
 
   final List<String> _subtitles = ['宠物管家', '宠物身份证', '设备与场景', '个人中心'];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeServices();
+  }
+
+  /// 初始化应用服务
+  Future<void> _initializeServices() async {
+    try {
+      // 初始化历史记录管理器
+      await HistoryManager.instance.initialize();
+      debugPrint('✅ 应用服务初始化完成');
+      
+      // 添加测试数据
+      await _addTestData();
+    } catch (e) {
+      debugPrint('❌ 应用服务初始化失败: $e');
+    }
+  }
+
+  /// 添加测试数据
+  Future<void> _addTestData() async {
+    try {
+      debugPrint('🔧 开始添加测试数据...');
+      
+      final now = DateTime.now();
+      
+      // 创建测试数据
+      final testActivities = [
+        {
+           'title': '玩耍行为',
+           'subInfo': '小猫在客厅里追逐玩具球，表现出很高的活跃度',
+           'confidence': 95,
+           'timestamp': now.subtract(const Duration(hours: 2)),
+         },
+         {
+           'title': '休息行为', 
+           'subInfo': '小猫在阳光下的猫窝里安静地睡觉',
+           'confidence': 88,
+           'timestamp': now.subtract(const Duration(hours: 1)),
+         },
+         {
+           'title': '进食行为',
+           'subInfo': '小猫正在吃猫粮，食欲良好',
+           'confidence': 92,
+           'timestamp': now.subtract(const Duration(minutes: 30)),
+         },
+      ];
+
+      for (final activity in testActivities) {
+        final aiResult = AIResult(
+           title: activity['title'] as String,
+           subInfo: activity['subInfo'] as String,
+           confidence: activity['confidence'] as int,
+         );
+
+        debugPrint('📝 正在添加测试数据: ${activity['title']} - ${activity['timestamp']}');
+        
+        await HistoryManager.instance.addHistoryWithTimestamp(
+          result: aiResult,
+          mode: 'behavior',
+          timestamp: activity['timestamp'] as DateTime,
+        );
+        
+        debugPrint('✅ 成功添加: ${activity['title']}');
+      }
+
+      debugPrint('✅ 测试数据添加完成，共添加 ${testActivities.length} 条记录');
+      
+      // 验证数据是否成功添加
+      final allHistories = await HistoryManager.instance.getAllHistories();
+      debugPrint('🔍 验证: HistoryManager中现有 ${allHistories.length} 条记录');
+    } catch (e) {
+      debugPrint('❌ 添加测试数据失败: $e');
+    }
+  }
 
   void _onTabTapped(int index) {
     setState(() {

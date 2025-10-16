@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/nothing_theme.dart';
 import '../models/analysis_history.dart';
+import 'edit_record_dialog.dart';
 
 class RecordDetailDialog extends StatelessWidget {
   final AnalysisHistory record;
@@ -285,10 +286,16 @@ class RecordDetailDialog extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {
-                // TODO: 实现编辑功能
-                Navigator.of(context).pop();
-              },
+              onPressed: () async {
+                 final result = await showDialog<bool>(
+                   context: context,
+                   builder: (context) => EditRecordDialog(history: record),
+                 );
+                 
+                 if (result == true) {
+                   Navigator.of(context).pop(); // 关闭详情对话框
+                 }
+               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: NothingTheme.accentPrimary,
                 shape: RoundedRectangleBorder(

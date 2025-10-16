@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../config/nothing_theme.dart';
+import '../models/health_report.dart';
+import '../widgets/nothing_card.dart';
+import '../widgets/unified_app_bar.dart';
 import '../widgets/vaccination_card.dart';
 import '../widgets/health_record_card.dart';
 import '../widgets/medical_history_card.dart';
@@ -64,34 +67,8 @@ class _HealthScreenState extends State<HealthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NothingTheme.background, // 米白主背景
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFFFF), // 纯白卡片
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F0), // 浅米色
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              size: 16,
-              color: Color(0xFF37474F), // 深灰文字
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          '健康管理',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF37474F), // 深灰文字
-          ),
-        ),
-        centerTitle: true,
+      appBar: const UnifiedAppBar(
+        title: '健康管理',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

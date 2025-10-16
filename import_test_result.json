@@ -1,0 +1,18 @@
+{
+  "total_records": 108,
+  "valid_records": 108,
+  "categories": {
+    "no_pet": 15,
+    "observe": 25,
+    "explore": 31,
+    "occupy": 11,
+    "neutral": 21,
+    "attack": 3,
+    "play": 2
+  },
+  "avg_confidence": 0.5,
+  "time_range": {
+    "start": "2025-10-13T19:50:51",
+    "end": "2025-10-13T20:26:42"
+  }
+}

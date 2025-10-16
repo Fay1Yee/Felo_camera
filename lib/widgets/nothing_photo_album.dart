@@ -25,7 +25,7 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
   String _selectedFilter = 'all';
   List<AnalysisHistory> _currentHistories = [];
   StreamSubscription<HistoryEvent>? _historySubscription;
-  
+
   final List<AlbumFilter> _filters = [
     AlbumFilter('all', '全部', Icons.photo_library),
     AlbumFilter('pet', '宠物', Icons.pets),
@@ -57,7 +57,9 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
 
   /// 设置历史记录变化监听器
   void _setupHistoryListener() {
-    _historySubscription = HistoryNotifier.instance.historyStream.listen((event) {
+    _historySubscription = HistoryNotifier.instance.historyStream.listen((
+      event,
+    ) {
       if (mounted) {
         setState(() {
           switch (event.type) {
@@ -77,7 +79,9 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
               break;
             case HistoryEventType.updated:
               if (event.history != null) {
-                final index = _currentHistories.indexWhere((h) => h.id == event.history!.id);
+                final index = _currentHistories.indexWhere(
+                  (h) => h.id == event.history!.id,
+                );
                 if (index != -1) {
                   _currentHistories[index] = event.history!;
                 }
@@ -92,7 +96,7 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
   @override
   Widget build(BuildContext context) {
     final filteredHistories = _getFilteredHistories();
-    
+
     return Column(
       children: [
         // 过滤器
@@ -113,12 +117,14 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
       padding: const EdgeInsets.symmetric(vertical: NothingTheme.spacingSmall),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: NothingTheme.spacingMedium),
+        padding: const EdgeInsets.symmetric(
+          horizontal: NothingTheme.spacingMedium,
+        ),
         itemCount: _filters.length,
         itemBuilder: (context, index) {
           final filter = _filters[index];
           final isSelected = _selectedFilter == filter.key;
-          
+
           return Container(
             margin: const EdgeInsets.only(right: NothingTheme.spacingSmall),
             child: FilterChip(
@@ -129,17 +135,21 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
                   Icon(
                     filter.icon,
                     size: 16,
-                    color: isSelected ? NothingTheme.nothingBlack : NothingTheme.nothingGray,
+                    color: isSelected
+                        ? NothingTheme.nothingBlack
+                        : NothingTheme.nothingGray,
                   ),
                   const SizedBox(width: NothingTheme.spacingSmall),
                   Text(
                     filter.label,
                     style: TextStyle(
                       fontSize: NothingTheme.fontSizeCaption,
-                      fontWeight: isSelected 
-                          ? NothingTheme.fontWeightMedium 
+                      fontWeight: isSelected
+                          ? NothingTheme.fontWeightMedium
                           : NothingTheme.fontWeightRegular,
-                      color: isSelected ? NothingTheme.nothingBlack : NothingTheme.nothingGray,
+                      color: isSelected
+                          ? NothingTheme.nothingBlack
+                          : NothingTheme.nothingGray,
                     ),
                   ),
                 ],
@@ -152,7 +162,9 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
               backgroundColor: NothingTheme.nothingWhite,
               selectedColor: NothingTheme.nothingYellow,
               side: BorderSide(
-                color: isSelected ? NothingTheme.nothingYellow : NothingTheme.nothingLightGray,
+                color: isSelected
+                    ? NothingTheme.nothingYellow
+                    : NothingTheme.nothingLightGray,
                 width: 1,
               ),
               shape: RoundedRectangleBorder(
@@ -199,7 +211,7 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
   Widget _buildPhotoGrid(List<AnalysisHistory> histories) {
     // 按月份分组
     final groupedHistories = _groupHistoriesByMonth(histories);
-    
+
     return ListView.builder(
       padding: const EdgeInsets.all(NothingTheme.spacingMedium),
       itemCount: groupedHistories.length,
@@ -212,24 +224,25 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
 
   List<MonthGroup> _groupHistoriesByMonth(List<AnalysisHistory> histories) {
     final Map<String, List<AnalysisHistory>> grouped = {};
-    
+
     for (final history in histories) {
       final monthKey = DateFormat('yyyy-MM').format(history.timestamp);
       grouped.putIfAbsent(monthKey, () => []).add(history);
     }
-    
+
     return grouped.entries.map((entry) {
       final date = DateTime.parse('${entry.key}-01');
       return MonthGroup(
         date: date,
-        histories: entry.value..sort((a, b) => b.timestamp.compareTo(a.timestamp)),
+        histories: entry.value
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
       );
     }).toList()..sort((a, b) => b.date.compareTo(a.date));
   }
 
   Widget _buildMonthGroup(MonthGroup monthGroup) {
     final monthLabel = DateFormat('yyyy年MM月').format(monthGroup.date);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -405,7 +418,9 @@ class _NothingPhotoAlbumState extends State<NothingPhotoAlbum> {
     if (_selectedFilter == 'all') {
       return _currentHistories;
     }
-    return _currentHistories.where((history) => history.mode == _selectedFilter).toList();
+    return _currentHistories
+        .where((history) => history.mode == _selectedFilter)
+        .toList();
   }
 
   Color _getModeColor(String mode) {
@@ -453,8 +468,5 @@ class MonthGroup {
   final DateTime date;
   final List<AnalysisHistory> histories;
 
-  MonthGroup({
-    required this.date,
-    required this.histories,
-  });
+  MonthGroup({required this.date, required this.histories});
 }

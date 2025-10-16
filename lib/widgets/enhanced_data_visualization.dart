@@ -214,7 +214,6 @@ class _EnhancedDataVisualizationState extends State<EnhancedDataVisualization>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   
-  List<DataSet> _dataSets = [];
   DataType _selectedDataType = DataType.activity;
   ChartType _selectedChartType = ChartType.line;
   TimeRange _selectedTimeRange = TimeRange.week;
@@ -254,8 +253,9 @@ class _EnhancedDataVisualizationState extends State<EnhancedDataVisualization>
   }
 
   void _loadData() {
+    // Mock data loading - can be removed if not needed
     setState(() {
-      _dataSets = DataSet.getMockDataSets();
+      // Data loading logic would go here
     });
   }
 

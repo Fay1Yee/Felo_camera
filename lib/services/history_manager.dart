@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/analysis_history.dart';
 import '../models/ai_result.dart';
 import 'history_notifier.dart';
@@ -25,18 +26,25 @@ class HistoryManager {
     if (_initialized) return;
     
     try {
-      final directory = await getApplicationDocumentsDirectory();
-      debugPrint('📁 应用程序文档目录: ${directory.path}');
-      
-      _historyFile = File('${directory.path}/analysis_history.json');
-      debugPrint('📄 历史记录文件路径: ${_historyFile!.path}');
-      
-      if (await _historyFile!.exists()) {
-        await _loadHistories();
+      if (kIsWeb) {
+        // Web平台使用SharedPreferences
+        debugPrint('🌐 Web平台：使用SharedPreferences存储历史记录');
+        await _loadHistoriesFromPrefs();
       } else {
-        debugPrint('📝 历史记录文件不存在，将创建新文件');
-        // 创建空的历史记录文件
-        await _saveHistories();
+        // 移动平台使用文件系统
+        final directory = await getApplicationDocumentsDirectory();
+        debugPrint('📁 应用程序文档目录: ${directory.path}');
+        
+        _historyFile = File('${directory.path}/analysis_history.json');
+        debugPrint('📄 历史记录文件路径: ${_historyFile!.path}');
+        
+        if (await _historyFile!.exists()) {
+          await _loadHistories();
+        } else {
+          debugPrint('📝 历史记录文件不存在，将创建新文件');
+          // 创建空的历史记录文件
+          await _saveHistories();
+        }
       }
       
       // 初始化通知器
@@ -57,13 +65,30 @@ class HistoryManager {
     String? imagePath,
     bool isRealtimeAnalysis = false,
   }) async {
+    await addHistoryWithTimestamp(
+      result: result,
+      mode: mode,
+      imagePath: imagePath,
+      isRealtimeAnalysis: isRealtimeAnalysis,
+      timestamp: DateTime.now(),
+    );
+  }
+
+  /// 添加带自定义时间戳的分析记录
+  Future<void> addHistoryWithTimestamp({
+    required AIResult result,
+    required String mode,
+    String? imagePath,
+    bool isRealtimeAnalysis = false,
+    DateTime? timestamp,
+  }) async {
     if (!_initialized) await initialize();
     
-    // 为移动端优化：检查图片文件是否存在，如果不存在则不保存路径
+    // 为移动端优化：在后台线程检查图片文件是否存在
     String? validImagePath = imagePath;
     if (imagePath != null) {
-      final imageFile = File(imagePath);
-      if (!await imageFile.exists()) {
+      final exists = await compute(_checkFileExists, imagePath);
+      if (!exists) {
         debugPrint('⚠️ 图片文件不存在，将不保存图片路径: $imagePath');
         validImagePath = null;
       }
@@ -71,10 +96,11 @@ class HistoryManager {
     
     // 保存实际选择的模式
     final String savedMode = mode;
+    final DateTime recordTimestamp = timestamp ?? DateTime.now();
     
     final history = AnalysisHistory(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      timestamp: DateTime.now(),
+      id: recordTimestamp.millisecondsSinceEpoch.toString(),
+      timestamp: recordTimestamp,
       result: result,
       imagePath: validImagePath,
       mode: savedMode,
@@ -86,21 +112,20 @@ class HistoryManager {
     // 移动端优化：限制历史记录数量，避免占用过多存储空间
     const maxHistories = 500; // 减少到500条以节省移动设备存储
     if (_histories.length > maxHistories) {
-      // 删除旧记录时，同时清理对应的图片文件
+      // 删除旧记录时，在后台线程清理对应的图片文件
       final oldHistories = _histories.skip(maxHistories).toList();
-      for (final oldHistory in oldHistories) {
-        if (oldHistory.imagePath != null) {
-          try {
-            final oldImageFile = File(oldHistory.imagePath!);
-            if (await oldImageFile.exists()) {
-              await oldImageFile.delete();
-              debugPrint('🗑️ 清理旧图片文件: ${oldHistory.imagePath}');
-            }
-          } catch (e) {
-            debugPrint('⚠️ 清理旧图片文件失败: $e');
-          }
-        }
+      final imagePaths = oldHistories
+          .where((h) => h.imagePath != null)
+          .map((h) => h.imagePath!)
+          .toList();
+      
+      if (imagePaths.isNotEmpty) {
+        // 在后台线程清理图片文件，不阻塞主线程
+        compute(_cleanupImageFiles, imagePaths).catchError((e) {
+          debugPrint('⚠️ 后台清理图片文件失败: $e');
+        });
       }
+      
       _histories = _histories.take(maxHistories).toList();
     }
     
@@ -230,14 +255,15 @@ class HistoryManager {
         return;
       }
 
-      final content = await _historyFile!.readAsString();
-      if (content.trim().isEmpty) {
+      // 在后台线程读取文件以避免主线程阻塞
+      final List<dynamic> jsonList = await compute(_loadHistoriesFromFile, _historyFile!.path);
+      
+      if (jsonList.isEmpty) {
         debugPrint('📝 历史记录文件为空，创建空列表');
         _histories = [];
         return;
       }
 
-      final List<dynamic> jsonList = jsonDecode(content);
       _histories = jsonList
           .map((json) => AnalysisHistory.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -256,25 +282,79 @@ class HistoryManager {
       _histories = []; // 确保有一个空列表
     }
   }
+
+  /// 在后台线程从文件加载历史记录
+  static Future<List<dynamic>> _loadHistoriesFromFile(String filePath) async {
+    final file = File(filePath);
+    
+    if (!await file.exists()) {
+      return [];
+    }
+    
+    final content = await file.readAsString();
+    if (content.trim().isEmpty) {
+      return [];
+    }
+
+    return jsonDecode(content) as List<dynamic>;
+  }
+
+  /// 在后台线程检查文件是否存在
+  static Future<bool> _checkFileExists(String filePath) async {
+    final file = File(filePath);
+    return await file.exists();
+  }
+
+  /// 在后台线程清理图片文件
+  static Future<void> _cleanupImageFiles(List<String> imagePaths) async {
+    for (final imagePath in imagePaths) {
+      try {
+        final imageFile = File(imagePath);
+        if (await imageFile.exists()) {
+          await imageFile.delete();
+          debugPrint('🗑️ 清理旧图片文件: $imagePath');
+        }
+      } catch (e) {
+        debugPrint('⚠️ 清理图片文件失败: $imagePath - $e');
+      }
+    }
+  }
   
   /// 保存历史记录
   Future<void> _saveHistories() async {
     try {
-      // 确保文件目录存在
-      if (_historyFile != null && !await _historyFile!.parent.exists()) {
-        await _historyFile!.parent.create(recursive: true);
+      if (kIsWeb) {
+        await _saveHistoriesToPrefs();
+      } else {
+        // 在后台线程执行文件I/O操作以避免主线程阻塞
+        await compute(_saveHistoriesToFile, {
+          'filePath': _historyFile!.path,
+          'histories': _histories.map((h) => h.toJson()).toList(),
+        });
+        
+        debugPrint('💾 历史记录保存成功: ${_historyFile!.path}');
+        debugPrint('📊 保存了 ${_histories.length} 条记录');
       }
-      
-      final jsonList = _histories.map((h) => h.toJson()).toList();
-      final content = json.encode(jsonList);
-      await _historyFile!.writeAsString(content);
-      
-      debugPrint('💾 历史记录保存成功: ${_historyFile!.path}');
-      debugPrint('📊 保存了 ${_histories.length} 条记录');
     } catch (e) {
       debugPrint('❌ 保存历史记录失败: $e');
       debugPrint('📁 文件路径: ${_historyFile?.path}');
     }
+  }
+
+  /// 在后台线程保存历史记录到文件
+  static Future<void> _saveHistoriesToFile(Map<String, dynamic> params) async {
+    final String filePath = params['filePath'];
+    final List<dynamic> histories = params['histories'];
+    
+    final file = File(filePath);
+    
+    // 确保文件目录存在
+    if (!await file.parent.exists()) {
+      await file.parent.create(recursive: true);
+    }
+    
+    final content = json.encode(histories);
+    await file.writeAsString(content);
   }
   
   /// 检查是否已初始化
@@ -282,4 +362,50 @@ class HistoryManager {
   
   /// 获取历史记录数量
   int get count => _histories.length;
+
+  /// Web平台：从SharedPreferences加载历史记录
+  Future<void> _loadHistoriesFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final content = prefs.getString('analysis_history');
+      
+      if (content == null || content.trim().isEmpty) {
+        debugPrint('📝 Web存储中没有历史记录，创建空列表');
+        _histories = [];
+        return;
+      }
+
+      final List<dynamic> jsonList = jsonDecode(content);
+      _histories = jsonList
+          .map((json) => AnalysisHistory.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      debugPrint('📂 Web平台成功加载历史记录: ${_histories.length} 条');
+      
+      // 验证加载的数据
+      for (int i = 0; i < _histories.length && i < 3; i++) {
+        final history = _histories[i];
+        debugPrint('📋 记录 ${i + 1}: ${history.result.title} (${history.mode})');
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Web平台加载历史记录失败: $e');
+      _histories = []; // 确保有一个空列表
+    }
+  }
+
+  /// Web平台：保存历史记录到SharedPreferences
+  Future<void> _saveHistoriesToPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = _histories.map((h) => h.toJson()).toList();
+      final content = json.encode(jsonList);
+      await prefs.setString('analysis_history', content);
+      
+      debugPrint('💾 Web平台历史记录保存成功');
+      debugPrint('📊 保存了 ${_histories.length} 条记录');
+    } catch (e) {
+      debugPrint('❌ Web平台保存历史记录失败: $e');
+    }
+  }
 }

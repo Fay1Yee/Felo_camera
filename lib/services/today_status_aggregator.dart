@@ -43,12 +43,18 @@ class TodayStatusAggregator {
       // 获取体重信息（从最新的健康分析中获取，如果没有则使用默认值）
       final weight = await _getLatestWeight(todayHistories);
       
+      // 获取体温和心率信息
+      final temperature = await _getLatestTemperature(todayHistories);
+      final heartRate = await _getLatestHeartRate(todayHistories);
+      
       final status = PetTodayStatus(
         overallStatus: overallStatus,
         mood: mood,
         activityLevel: activityLevel,
         todayActivities: todayActivities,
         weight: weight,
+        temperature: temperature,
+        heartRate: heartRate,
       );
       
       debugPrint('✅ AI数据聚合完成: 状态=${overallStatus.name}, 心情=$mood, 活跃度=$activityLevel%');
@@ -254,6 +260,62 @@ class TodayStatusAggregator {
     }
   }
 
+  /// 获取最新体温信息
+  Future<double> _getLatestTemperature(List<AnalysisHistory> histories) async {
+    try {
+      // 查找健康分析记录
+      final healthHistories = histories.where((h) => 
+        h.mode == Mode.health || 
+        h.result.title.contains('健康')
+      ).toList();
+      
+      if (healthHistories.isNotEmpty) {
+        // 尝试从分析结果中提取体温信息
+        for (final history in healthHistories) {
+          final subInfo = history.result.subInfo ?? '';
+          final tempMatch = RegExp(r'体温[：:]\s*(\d+\.?\d*)\s*[°℃]?[cC]?').firstMatch(subInfo);
+          if (tempMatch != null) {
+            return double.tryParse(tempMatch.group(1) ?? '') ?? 38.5;
+          }
+        }
+      }
+      
+      // 默认体温
+      return 38.5;
+    } catch (e) {
+      debugPrint('⚠️ 获取体温信息失败: $e');
+      return 38.5;
+    }
+  }
+
+  /// 获取最新心率信息
+  Future<int> _getLatestHeartRate(List<AnalysisHistory> histories) async {
+    try {
+      // 查找健康分析记录
+      final healthHistories = histories.where((h) => 
+        h.mode == Mode.health || 
+        h.result.title.contains('健康')
+      ).toList();
+      
+      if (healthHistories.isNotEmpty) {
+        // 尝试从分析结果中提取心率信息
+        for (final history in healthHistories) {
+          final subInfo = history.result.subInfo ?? '';
+          final heartRateMatch = RegExp(r'心率[：:]\s*(\d+)\s*[次/分钟bpm]?').firstMatch(subInfo);
+          if (heartRateMatch != null) {
+            return int.tryParse(heartRateMatch.group(1) ?? '') ?? 85;
+          }
+        }
+      }
+      
+      // 默认心率
+      return 85;
+    } catch (e) {
+      debugPrint('⚠️ 获取心率信息失败: $e');
+      return 85;
+    }
+  }
+
   /// 获取活动图标
   IconData _getActivityIcon(String activityName) {
     if (activityName.contains('散步') || activityName.contains('运动')) {
@@ -297,6 +359,8 @@ class TodayStatusAggregator {
       activityLevel: 50,
       todayActivities: _getDefaultActivities(),
       weight: 12.5,
+      temperature: 38.5,
+      heartRate: 85,
     );
   }
 }

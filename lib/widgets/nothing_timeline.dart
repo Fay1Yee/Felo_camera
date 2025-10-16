@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import '../config/nothing_theme.dart';
 import '../models/analysis_history.dart';
+import '../models/ai_result.dart';
 import '../services/history_notifier.dart';
 import 'dart:convert';
 
@@ -123,7 +124,40 @@ class _NothingTimelineState extends State<NothingTimeline> {
   List<DateGroup> _groupHistoriesByDate(List<AnalysisHistory> histories) {
     final Map<String, List<AnalysisHistory>> grouped = {};
     
+    // 首先展开所有多事件历史记录
+    final List<AnalysisHistory> expandedHistories = [];
+    
     for (final history in histories) {
+      if (history.result.multipleEvents != null && history.result.multipleEvents!.isNotEmpty) {
+        // 为每个事件创建独立的AnalysisHistory对象
+        for (int eventIndex = 0; eventIndex < history.result.multipleEvents!.length; eventIndex++) {
+          final event = history.result.multipleEvents![eventIndex];
+          
+          final eventHistory = AnalysisHistory(
+            id: '${history.id}_event_$eventIndex',
+            result: AIResult(
+              title: '${event.category} - ${event.title}',
+              confidence: event.confidence.toInt(),
+              subInfo: event.content,
+              bbox: history.result.bbox,
+              multipleEvents: null,
+            ),
+            timestamp: event.timestamp,
+            mode: history.mode,
+            isRealtimeAnalysis: history.isRealtimeAnalysis,
+            imagePath: history.imagePath,
+          );
+          
+          expandedHistories.add(eventHistory);
+        }
+      } else {
+        // 没有多个事件，直接添加原始历史记录
+        expandedHistories.add(history);
+      }
+    }
+    
+    // 按日期分组展开后的历史记录
+    for (final history in expandedHistories) {
       final dateKey = DateFormat('yyyy-MM-dd').format(history.timestamp);
       grouped.putIfAbsent(dateKey, () => []).add(history);
     }
@@ -132,7 +166,7 @@ class _NothingTimelineState extends State<NothingTimeline> {
       final date = DateTime.parse(entry.key);
       return DateGroup(
         date: date,
-        histories: entry.value..sort((a, b) => b.timestamp.compareTo(a.timestamp)),
+        histories: entry.value..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
       );
     }).toList()..sort((a, b) => b.date.compareTo(a.date));
   }
@@ -190,15 +224,22 @@ class _NothingTimelineState extends State<NothingTimeline> {
           ),
         ),
         // 时间轴项目
-        ...dateGroup.histories.asMap().entries.map((entry) {
-          final index = entry.key;
-          final history = entry.value;
-          final isLast = index == dateGroup.histories.length - 1;
-          
-          return _buildTimelineItem(history, isLast);
-        }),
+        ..._buildExpandedTimelineItems(dateGroup.histories),
       ],
     );
+  }
+
+  /// 构建时间轴项目列表（多事件已在日期分组中展开）
+  List<Widget> _buildExpandedTimelineItems(List<AnalysisHistory> histories) {
+    final List<Widget> items = [];
+    
+    for (int index = 0; index < histories.length; index++) {
+      final history = histories[index];
+      final isLast = index == histories.length - 1;
+      items.add(_buildTimelineItem(history, isLast));
+    }
+    
+    return items;
   }
 
   Widget _buildTimelineItem(AnalysisHistory history, bool isLast) {

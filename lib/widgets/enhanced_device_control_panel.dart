@@ -504,6 +504,8 @@ class _EnhancedDeviceControlPanelState extends State<EnhancedDeviceControlPanel>
               childAspectRatio: 1.1,
             ),
             itemCount: filteredDevices.length,
+            addAutomaticKeepAlives: false, // 不保持离屏组件状态，减少内存使用
+            addRepaintBoundaries: true, // 添加重绘边界，提高渲染性能
             itemBuilder: (context, index) {
               return _buildDeviceCard(filteredDevices[index]);
             },

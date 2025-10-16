@@ -1,10 +1,14 @@
 import 'analysis_history.dart';
+import 'ai_result.dart';
+import '../services/behavior_classification_service.dart';
+import '../services/behavior_analyzer.dart';
 
 /// 宠物行为分析数据模型
 class BehaviorAnalytics {
   final Map<String, int> behaviorFrequency;
   final Map<String, Duration> behaviorDuration;
   final Map<int, int> hourlyActivity; // 小时 -> 活动次数
+  final Map<int, Map<String, int>> hourlyBehaviorDistribution; // 小时 -> 行为类型 -> 次数
   final Map<String, double> behaviorTrends; // 行为趋势（相比上周的变化百分比）
   final List<BehaviorInsight> insights;
   final DateTime analysisDate;
@@ -14,6 +18,7 @@ class BehaviorAnalytics {
     required this.behaviorFrequency,
     required this.behaviorDuration,
     required this.hourlyActivity,
+    required this.hourlyBehaviorDistribution,
     required this.behaviorTrends,
     required this.insights,
     required this.analysisDate,
@@ -25,7 +30,13 @@ class BehaviorAnalytics {
     final behaviorFreq = <String, int>{};
     final behaviorDur = <String, Duration>{};
     final hourlyAct = <int, int>{};
+    final hourlyBehaviorDist = <int, Map<String, int>>{};
     final behaviorTrends = <String, double>{};
+    
+    // 初始化每小时行为分布
+    for (int hour = 0; hour < 24; hour++) {
+      hourlyBehaviorDist[hour] = <String, int>{};
+    }
     
     // 统计行为频率和时间分布
     for (final history in histories) {
@@ -34,6 +45,10 @@ class BehaviorAnalytics {
       
       final hour = history.timestamp.hour;
       hourlyAct[hour] = (hourlyAct[hour] ?? 0) + 1;
+      
+      // 统计每小时各类行为分布
+      final hourBehaviors = hourlyBehaviorDist[hour]!;
+      hourBehaviors[behavior] = (hourBehaviors[behavior] ?? 0) + 1;
     }
 
     // 计算行为持续时间（基于连续相同行为的时间间隔）
@@ -49,6 +64,7 @@ class BehaviorAnalytics {
       behaviorFrequency: behaviorFreq,
       behaviorDuration: behaviorDur,
       hourlyActivity: hourlyAct,
+      hourlyBehaviorDistribution: hourlyBehaviorDist,
       behaviorTrends: behaviorTrends,
       insights: insights,
       analysisDate: DateTime.now(),
@@ -58,15 +74,51 @@ class BehaviorAnalytics {
 
   /// 提取行为类型
   static String _extractBehavior(String title) {
-    // 根据AI结果标题提取行为类型
+    // 使用BehaviorClassificationService进行标准化映射
+    final classificationService = BehaviorClassificationService.instance;
+    
+    // 首先尝试直接映射
+    final mappedBehavior = classificationService.mapBehaviorToDisplayName(title);
+    if (mappedBehavior != title) {
+      return mappedBehavior;
+    }
+    
+    // 使用BehaviorAnalyzer的推理方法获取行为标签
+    final analyzer = BehaviorAnalyzer.instance;
+    final mockResult = AIResult(
+      title: title,
+      confidence: 50,
+    );
+    
+    // 获取推理的行为标签
+    final tags = analyzer.inferBehaviorTags(mockResult, 'pet');
+    
+    if (tags.isNotEmpty) {
+      // 使用分类服务标准化第一个标签
+      return classificationService.mapBehaviorToDisplayName(tags.first);
+    }
+    
+    // 如果没有推理出标签，使用简化的关键词匹配
     final lowerTitle = title.toLowerCase();
     
-    if (lowerTitle.contains('睡觉') || lowerTitle.contains('休息') || lowerTitle.contains('躺')) {
+    if (lowerTitle.contains('observe') || lowerTitle.contains('观望') || lowerTitle.contains('观察')) {
+      return '观望';
+    } else if (lowerTitle.contains('explore') || lowerTitle.contains('探索')) {
+      return '探索';
+    } else if (lowerTitle.contains('occupy') || lowerTitle.contains('领地') || lowerTitle.contains('占据')) {
+      return '领地';
+    } else if (lowerTitle.contains('play') || lowerTitle.contains('玩') || lowerTitle.contains('游戏')) {
+      return '玩耍';
+    } else if (lowerTitle.contains('attack') || lowerTitle.contains('攻击') || lowerTitle.contains('袭击')) {
+      return '攻击';
+    } else if (lowerTitle.contains('neutral') || lowerTitle.contains('中性') || lowerTitle.contains('无特定')) {
+      return '中性';
+    } else if (lowerTitle.contains('no_pet') || lowerTitle.contains('无宠物') || lowerTitle.contains('没有宠物')) {
+      return '无宠物';
+    } else if (lowerTitle.contains('睡觉') || lowerTitle.contains('休息') || lowerTitle.contains('躺')) {
       return '休息';
     } else if (lowerTitle.contains('吃') || lowerTitle.contains('进食')) {
       return '进食';
-    } else if (lowerTitle.contains('玩') || lowerTitle.contains('游戏')) {
-      return '玩耍';
     } else if (lowerTitle.contains('跑') || lowerTitle.contains('运动') || lowerTitle.contains('活动')) {
       return '运动';
     } else if (lowerTitle.contains('坐') || lowerTitle.contains('站')) {
@@ -193,12 +245,34 @@ class BehaviorAnalytics {
   /// 获取行为对应的图标
   static String _getBehaviorIcon(String behavior) {
     switch (behavior) {
-      case '休息': return '😴';
-      case '进食': return '🍽️';
+      // 文档标准分类
+      case '观望行为': return '👀';
+      case '探索行为': return '🔍';
+      case '领地行为': return '🏠';
+      case '无特定行为': return '😐';
+      case '攻击行为': return '⚔️';
+      case '玩耍行为': return '🎾';
+      case '无宠物': return '❌';
+      
+      // 程序现有分类
       case '玩耍': return '🎾';
+      case '进食': return '🍽️';
+      case '睡觉': return '😴';
+      case '喂食': return '🥣';
+      case '梳理': return '🪮';
+      case '休息': return '😴';
+      case '奔跑': return '🏃';
+      case '散步': return '🚶';
+      case '训练': return '🎯';
+      case '社交': return '👥';
+      case '探索': return '🔍';
+      case '其他': return '❓';
+      
+      // 兼容旧版本
       case '运动': return '🏃';
       case '静止': return '🧘';
       case '发声': return '🔊';
+      
       default: return '🐾';
     }
   }

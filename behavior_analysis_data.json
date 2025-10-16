@@ -1,0 +1,177 @@
+{
+  "behavior_patterns": {
+    "occupy": {
+      "count": 11,
+      "percentage": 10.185185185185185,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 4,
+        "20": 7
+      },
+      "avg_description_length": 70.36363636363636,
+      "peak_hours": [
+        [
+          20,
+          7
+        ],
+        [
+          19,
+          4
+        ]
+      ]
+    },
+    "no_pet": {
+      "count": 15,
+      "percentage": 13.88888888888889,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 10,
+        "20": 5
+      },
+      "avg_description_length": 59.666666666666664,
+      "peak_hours": [
+        [
+          19,
+          10
+        ],
+        [
+          20,
+          5
+        ]
+      ]
+    },
+    "play": {
+      "count": 2,
+      "percentage": 1.8518518518518516,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 2
+      },
+      "avg_description_length": 89.0,
+      "peak_hours": [
+        [
+          19,
+          2
+        ]
+      ]
+    },
+    "neutral": {
+      "count": 21,
+      "percentage": 19.444444444444446,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 9,
+        "20": 12
+      },
+      "avg_description_length": 73.80952380952381,
+      "peak_hours": [
+        [
+          20,
+          12
+        ],
+        [
+          19,
+          9
+        ]
+      ]
+    },
+    "explore": {
+      "count": 31,
+      "percentage": 28.703703703703702,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 10,
+        "20": 21
+      },
+      "avg_description_length": 68.87096774193549,
+      "peak_hours": [
+        [
+          20,
+          21
+        ],
+        [
+          19,
+          10
+        ]
+      ]
+    },
+    "attack": {
+      "count": 3,
+      "percentage": 2.7777777777777777,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 3
+      },
+      "avg_description_length": 94.33333333333333,
+      "peak_hours": [
+        [
+          19,
+          3
+        ]
+      ]
+    },
+    "observe": {
+      "count": 25,
+      "percentage": 23.14814814814815,
+      "avg_confidence": 0.5,
+      "hour_distribution": {
+        "19": 10,
+        "20": 15
+      },
+      "avg_description_length": 71.56,
+      "peak_hours": [
+        [
+          20,
+          15
+        ],
+        [
+          19,
+          10
+        ]
+      ]
+    }
+  },
+  "behavior_transitions": {
+    "no_pet -> observe": 3,
+    "observe -> explore": 7,
+    "explore -> no_pet": 1,
+    "observe -> observe": 10,
+    "explore -> occupy": 3,
+    "occupy -> occupy": 2,
+    "occupy -> no_pet": 2,
+    "no_pet -> neutral": 1,
+    "neutral -> observe": 1,
+    "observe -> neutral": 4,
+    "neutral -> explore": 10,
+    "explore -> observe": 8,
+    "observe -> no_pet": 2,
+    "no_pet -> no_pet": 7,
+    "observe -> occupy": 2,
+    "no_pet -> explore": 2,
+    "explore -> attack": 1,
+    "attack -> explore": 2,
+    "explore -> neutral": 7,
+    "neutral -> neutral": 4,
+    "neutral -> attack": 2,
+    "attack -> neutral": 1,
+    "explore -> explore": 9,
+    "occupy -> observe": 3,
+    "explore -> play": 2,
+    "play -> neutral": 1,
+    "play -> no_pet": 1,
+    "no_pet -> occupy": 1,
+    "occupy -> neutral": 3,
+    "neutral -> occupy": 3,
+    "occupy -> explore": 1,
+    "neutral -> no_pet": 1
+  },
+  "insights": [
+    "最常见的行为是'explore'，占总活动的28.7%",
+    "置信度最高的行为是'occupy'，平均置信度为0.50",
+    "最活跃的时段是20:00-20:59，共有60次活动"
+  ],
+  "recommendations": [
+    "宠物表现出较强的探索欲望，建议提供更多新环境和玩具",
+    "以下行为的识别置信度较低，建议改善监控条件: occupy, no_pet, play, neutral, explore, attack, observe"
+  ]
+}

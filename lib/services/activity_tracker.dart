@@ -387,26 +387,45 @@ class ActivityTracker {
     final location = environmentScore > 0.3 ? '户外' : '室内';
     
     switch (activityType) {
+      // 文档标准分类
+      case ActivityType.observe:
+        return '在$location观望周围环境，光线$lightingCondition';
+      case ActivityType.explore:
+        return '在$location探索新环境，光线$lightingCondition';
+      case ActivityType.occupy:
+        return '在$location占据领地，光线$lightingCondition';
+      case ActivityType.play:
+        return '在$location进行玩耍活动，光线$lightingCondition';
+      case ActivityType.attack:
+        return '在$location表现出攻击行为，光线$lightingCondition';
+      case ActivityType.neutral:
+        return '在$location保持中性状态，光线$lightingCondition';
+      case ActivityType.no_pet:
+        return '在$location未检测到宠物，光线$lightingCondition';
+      
+      // 程序现有分类
       case ActivityType.playing:
         return '在$location愉快地玩耍，光线$lightingCondition';
       case ActivityType.eating:
         return '在$location进食，光线$lightingCondition';
       case ActivityType.sleeping:
         return '在$location安静地睡觉，光线$lightingCondition';
-      case ActivityType.walking:
-        return '在$location悠闲地散步，光线$lightingCondition';
-      case ActivityType.running:
-        return '在$location快速奔跑，光线$lightingCondition';
+      case ActivityType.feeding:
+        return '在$location进行喂食，光线$lightingCondition';
       case ActivityType.grooming:
         return '在$location进行自我清洁，光线$lightingCondition';
+      case ActivityType.resting:
+        return '在$location安静地休息，光线$lightingCondition';
+      case ActivityType.running:
+        return '在$location快速奔跑，光线$lightingCondition';
+      case ActivityType.walking:
+        return '在$location悠闲地散步，光线$lightingCondition';
       case ActivityType.training:
         return '在$location进行训练活动，光线$lightingCondition';
       case ActivityType.socializing:
         return '在$location与其他动物或人类互动，光线$lightingCondition';
       case ActivityType.exploring:
         return '在$location好奇地探索周围环境，光线$lightingCondition';
-      case ActivityType.resting:
-        return '在$location安静地休息，光线$lightingCondition';
       case ActivityType.other:
         return '在$location进行其他活动，光线$lightingCondition';
     }
@@ -433,26 +452,45 @@ class ActivityTracker {
     final random = math.Random();
     
     switch (activityType) {
+      // 文档标准分类
+      case ActivityType.observe:
+        return Duration(minutes: 10 + random.nextInt(20));
+      case ActivityType.explore:
+        return Duration(minutes: 15 + random.nextInt(30));
+      case ActivityType.occupy:
+        return Duration(minutes: 30 + random.nextInt(60));
+      case ActivityType.play:
+        return Duration(minutes: 20 + random.nextInt(40));
+      case ActivityType.attack:
+        return Duration(minutes: 2 + random.nextInt(8));
+      case ActivityType.neutral:
+        return Duration(minutes: 5 + random.nextInt(15));
+      case ActivityType.no_pet:
+        return Duration(minutes: 0);
+      
+      // 程序现有分类
       case ActivityType.playing:
         return Duration(minutes: 15 + random.nextInt(30));
       case ActivityType.eating:
         return Duration(minutes: 5 + random.nextInt(15));
       case ActivityType.sleeping:
         return Duration(hours: 1 + random.nextInt(4));
-      case ActivityType.walking:
-        return Duration(minutes: 20 + random.nextInt(40));
-      case ActivityType.running:
-        return Duration(minutes: 5 + random.nextInt(15));
+      case ActivityType.feeding:
+        return Duration(minutes: 3 + random.nextInt(7));
       case ActivityType.grooming:
         return Duration(minutes: 10 + random.nextInt(20));
+      case ActivityType.resting:
+        return Duration(minutes: 30 + random.nextInt(60));
+      case ActivityType.running:
+        return Duration(minutes: 5 + random.nextInt(15));
+      case ActivityType.walking:
+        return Duration(minutes: 20 + random.nextInt(40));
       case ActivityType.training:
         return Duration(minutes: 15 + random.nextInt(25));
       case ActivityType.socializing:
         return Duration(minutes: 10 + random.nextInt(30));
       case ActivityType.exploring:
         return Duration(minutes: 20 + random.nextInt(40));
-      case ActivityType.resting:
-        return Duration(minutes: 30 + random.nextInt(60));
       case ActivityType.other:
         return Duration(minutes: 10 + random.nextInt(20));
     }

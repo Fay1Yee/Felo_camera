@@ -3,27 +3,29 @@ import '../models/pet_profile.dart';
 import '../widgets/pet_id_card.dart';
 import '../widgets/profile_management_section.dart';
 import '../widgets/personality_tags_section.dart';
+import '../utils/responsive_helper.dart';
 import 'health_screen.dart';
 import 'habits_detail_screen.dart';
 import 'life_records_screen.dart';
+import 'personality_analysis_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
-  // 模拟宠物数据
+  // 模拟宠物数据 - 基于布偶猫图片特征
   final PetProfile _petProfile = PetProfile(
     id: 'pet_001',
-    name: '小白',
+    name: '泡泡',
     type: '猫',
-    breed: '田园猫',
+    breed: '布偶猫',
     gender: '母',
-    birthDate: DateTime(2022, 3, 15),
-    weight: 4.2,
-    color: '白色',
-    avatarUrl: 'assets/images/pet_avatar.png',
+    birthDate: DateTime(2022, 3, 20),
+    weight: 5.2,
+    color: '纯白色长毛',
+    avatarUrl: 'assets/images/pet_photo.jpg',
     chipId: 'CH001234567',
     registrationNumber: 'REG2024001',
-    personalityTags: ['超级黏人', '好奇宝宝', '爱撒娇', '胆小', '活泼', '聪明'],
+    personalityTags: ['温和安静', '眼神温顺', '亲人型', '温柔可亲', '优雅贵族'],
     healthInfo: PetHealthInfo(
       isNeutered: true,
       allergies: [],
@@ -47,10 +49,24 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      padding: EdgeInsets.all(
+        ResponsiveHelper.getResponsiveSpacing(
+          context,
+          mobile: 20,
+          tablet: 32,
+          desktop: 48,
+        ),
+      ),
+      child: ResponsiveContainer(
+        mobilePadding: EdgeInsets.zero,
+        tabletPadding: const EdgeInsets.symmetric(horizontal: 24.0),
+        desktopPadding: const EdgeInsets.symmetric(horizontal: 48.0),
+        mobileMaxWidth: double.infinity,
+        tabletMaxWidth: 800,
+        desktopMaxWidth: 1000,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // 宠物身份证
           PetIdCard(
             petProfile: _petProfile,
@@ -62,23 +78,39 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           
-          const SizedBox(height: 24),
+          SizedBox(
+            height: ResponsiveHelper.getResponsiveSpacing(
+              context,
+              mobile: 24,
+              tablet: 32,
+              desktop: 40,
+            ),
+          ),
           
           // 性格特征
           PersonalityTagsSection(
             personalityTags: _petProfile.personalityTags,
           ),
           
-          const SizedBox(height: 24),
+          SizedBox(
+            height: ResponsiveHelper.getResponsiveSpacing(
+              context,
+              mobile: 24,
+              tablet: 32,
+              desktop: 40,
+            ),
+          ),
           
           // 档案管理
           ProfileManagementSection(
             onEditProfile: () => _showEditDialog(context),
+            onPersonalityAnalysis: () => _navigateToPersonalityAnalysis(context),
             onHealthRecords: () => _navigateToHealthRecords(context),
             onHabitsAnalysis: () => _navigateToHabitsAnalysis(context),
             onLifeRecords: () => _navigateToLifeRecords(context),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -95,6 +127,19 @@ class ProfileScreen extends StatelessWidget {
             child: const Text('确定'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToPersonalityAnalysis(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PersonalityAnalysisScreen(
+          petId: _petProfile.id,
+          petName: _petProfile.name,
+          activities: const [], // 可以从宠物档案中获取活动数据
+        ),
       ),
     );
   }

@@ -1,0 +1,18 @@
+# 宠物活动数据示例文件
+# 支持多种格式
+
+# 格式1: 制表符分隔
+2025-01-20T10:30:00Z	eating	0.95	{"location": "kitchen", "duration": "5 minutes", "food_type": "dry kibble"}
+2025-01-20T14:15:00Z	sleeping	0.88	{"location": "living room", "position": "curled up", "duration": "2 hours"}
+
+# 格式2: 逗号分隔
+2025-01-20T16:45:00Z,playing,0.92,"{""toy"": ""ball"", ""energy_level"": ""high"", ""duration"": ""15 minutes""}"
+
+# 格式3: 结构化文本
+时间戳: 2025-01-20T18:20:00Z, 类别: drinking, 置信度: 0.87, 原因: {"location": "water bowl", "amount": "normal", "frequency": "regular"}
+
+# 格式4: 英文结构化文本
+timestamp: 2025-01-20T20:10:00Z, category: grooming, confidence: 0.91, reasons: {"body_part": "paws", "duration": "3 minutes", "behavior": "licking"}
+
+# 格式5: 空格分隔
+2025-01-20T22:00:00Z resting 0.85 {"location": "bed", "position": "lying down", "comfort_level": "high"}

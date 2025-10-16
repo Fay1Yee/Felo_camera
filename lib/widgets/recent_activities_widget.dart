@@ -41,7 +41,7 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
         activityId: '1',
         petId: widget.petId,
         timestamp: now.subtract(const Duration(minutes: 30)),
-        petName: '小橘',
+        petName: '泡泡',
         activityType: ActivityType.playing,
         description: '在客厅里追逐激光笔，表现得非常兴奋',
         location: '客厅',
@@ -55,7 +55,7 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
         activityId: '2',
         petId: widget.petId,
         timestamp: now.subtract(const Duration(hours: 2)),
-        petName: '小橘',
+        petName: '泡泡',
         activityType: ActivityType.eating,
         description: '正常进食，食欲良好',
         location: '厨房',
@@ -69,7 +69,7 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
         activityId: '3',
         petId: widget.petId,
         timestamp: now.subtract(const Duration(hours: 4)),
-        petName: '小橘',
+        petName: '泡泡',
         activityType: ActivityType.sleeping,
         description: '在阳台的猫窝里安静睡觉',
         location: '阳台',
@@ -83,7 +83,7 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
         activityId: '4',
         petId: widget.petId,
         timestamp: now.subtract(const Duration(hours: 6)),
-        petName: '小橘',
+        petName: '泡泡',
         activityType: ActivityType.grooming,
         description: '自我清洁，梳理毛发',
         location: '卧室',
@@ -97,7 +97,7 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
         activityId: '5',
         petId: widget.petId,
         timestamp: now.subtract(const Duration(hours: 8)),
-        petName: '小橘',
+        petName: '泡泡',
         activityType: ActivityType.exploring,
         description: '在阳台观察外面的鸟类',
         location: '阳台',
@@ -474,12 +474,30 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
 
   IconData _getActivityIcon(ActivityType type) {
     switch (type) {
+      // 文档标准分类
+      case ActivityType.observe:
+        return Icons.visibility_outlined;
+      case ActivityType.explore:
+        return Icons.search_outlined;
+      case ActivityType.occupy:
+        return Icons.home_outlined;
+      case ActivityType.play:
+        return Icons.sports_tennis_outlined;
+      case ActivityType.attack:
+        return Icons.warning_outlined;
+      case ActivityType.neutral:
+        return Icons.remove_circle_outline;
+      case ActivityType.no_pet:
+        return Icons.pets_outlined;
+      // 程序现有分类
       case ActivityType.playing:
         return Icons.sports_esports_outlined;
       case ActivityType.eating:
         return Icons.restaurant_outlined;
       case ActivityType.sleeping:
         return Icons.bedtime_outlined;
+      case ActivityType.feeding:
+        return Icons.food_bank_outlined;
       case ActivityType.walking:
         return Icons.directions_walk_outlined;
       case ActivityType.running:
@@ -501,12 +519,30 @@ class _RecentActivitiesWidgetState extends State<RecentActivitiesWidget> {
 
   Color _getActivityColor(ActivityType type) {
     switch (type) {
+      // 文档标准分类
+      case ActivityType.observe:
+        return NothingTheme.info;
+      case ActivityType.explore:
+        return NothingTheme.accentPrimary;
+      case ActivityType.occupy:
+        return NothingTheme.brandPrimary;
+      case ActivityType.play:
+        return NothingTheme.warning;
+      case ActivityType.attack:
+        return NothingTheme.error;
+      case ActivityType.neutral:
+        return NothingTheme.gray400;
+      case ActivityType.no_pet:
+        return NothingTheme.textSecondary;
+      // 程序现有分类
       case ActivityType.playing:
         return NothingTheme.warning;
       case ActivityType.eating:
         return NothingTheme.success;
       case ActivityType.sleeping:
         return NothingTheme.info;
+      case ActivityType.feeding:
+        return NothingTheme.success;
       case ActivityType.walking:
       case ActivityType.running:
         return NothingTheme.accentPrimary;

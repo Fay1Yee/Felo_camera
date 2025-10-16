@@ -1,0 +1,39 @@
+{
+  "summary": {
+    "total_records": 108,
+    "total_categories": 7,
+    "avg_confidence": 0.5,
+    "date_range": {
+      "start": "2025-10-13 19:50:51",
+      "end": "2025-10-13 20:26:42"
+    }
+  },
+  "daily_statistics": {
+    "2025-10-13": {
+      "total_activities": 108,
+      "categories": {
+        "no_pet": 15,
+        "observe": 25,
+        "explore": 31,
+        "occupy": 11,
+        "neutral": 21,
+        "attack": 3,
+        "play": 2
+      },
+      "avg_confidence": 0.5
+    }
+  },
+  "hourly_distribution": {
+    "19": 48,
+    "20": 60
+  },
+  "category_distribution": {
+    "no_pet": 15,
+    "observe": 25,
+    "explore": 31,
+    "occupy": 11,
+    "neutral": 21,
+    "attack": 3,
+    "play": 2
+  }
+}

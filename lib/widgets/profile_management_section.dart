@@ -6,6 +6,7 @@ class ProfileManagementSection extends StatelessWidget {
   final VoidCallback? onHealthRecords;
   final VoidCallback? onHabitsAnalysis;
   final VoidCallback? onLifeRecords;
+  final VoidCallback? onPersonalityAnalysis;
 
   const ProfileManagementSection({
     super.key,
@@ -13,6 +14,7 @@ class ProfileManagementSection extends StatelessWidget {
     this.onHealthRecords,
     this.onHabitsAnalysis,
     this.onLifeRecords,
+    this.onPersonalityAnalysis,
   });
 
   @override
@@ -21,7 +23,7 @@ class ProfileManagementSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '档案管理',
+          '我的档案管理',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -42,30 +44,37 @@ class ProfileManagementSection extends StatelessWidget {
           children: [
             _buildManagementCard(
               icon: Icons.edit,
-              title: '编辑档案',
-              subtitle: '修改基本信息',
+              title: '编辑我的档案',
+              subtitle: '修改我的基本信息',
               color: NothingTheme.brandPrimary,
               onTap: onEditProfile,
             ),
             _buildManagementCard(
-              icon: Icons.health_and_safety,
-              title: '健康记录',
-              subtitle: '查看健康档案',
+              icon: Icons.psychology,
+              title: '性格分析',
+              subtitle: 'AI智能性格分析',
               color: NothingTheme.accentPrimary,
+              onTap: onPersonalityAnalysis,
+            ),
+            _buildManagementCard(
+              icon: Icons.health_and_safety,
+              title: '我的健康记录',
+              subtitle: '查看我的健康档案',
+              color: NothingTheme.accentSecondary,
               onTap: onHealthRecords,
             ),
             _buildManagementCard(
               icon: Icons.analytics,
-              title: '习惯分析',
-              subtitle: '行为数据分析',
-              color: NothingTheme.accentSecondary,
+              title: '我的习惯分析',
+              subtitle: '我的行为数据分析',
+              color: NothingTheme.brandSecondary,
               onTap: onHabitsAnalysis,
             ),
             _buildManagementCard(
               icon: Icons.photo_library,
-              title: '生活记录',
-              subtitle: '成长轨迹记录',
-              color: NothingTheme.brandSecondary,
+              title: '我的生活记录',
+              subtitle: '我的成长轨迹记录',
+              color: NothingTheme.warning,
               onTap: onLifeRecords,
             ),
           ],

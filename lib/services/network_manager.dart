@@ -29,8 +29,8 @@ class NetworkManager {
   
   // 连接池配置
   static const int _maxConnections = 5;
-  static const Duration _connectionTimeout = Duration(seconds: 15); // 减少连接超时
-  static const Duration _requestTimeout = Duration(seconds: 10); // 减少请求超时
+  static const Duration _connectionTimeout = Duration(seconds: 30); // 增加连接超时
+  static const Duration _requestTimeout = Duration(seconds: 60); // 增加请求超时，特别是为了文档分析
   
   // 请求合并配置
   // ignore: unused_field
@@ -218,12 +218,25 @@ class NetworkManager {
   
   /// 预热连接
   Future<void> preWarmConnection(String host, int port) async {
-    try {
-      final socket = await Socket.connect(host, port, timeout: _connectionTimeout);
-      await socket.close();
-      debugPrint('🔥 预热连接成功: $host:$port');
-    } catch (e) {
-      debugPrint('⚠️ 预热连接失败: $host:$port - $e');
+    if (kIsWeb) {
+      // Web平台不支持Socket，使用HTTP请求预热
+      try {
+        final scheme = port == 443 ? 'https' : 'http';
+        final url = Uri.parse('$scheme://$host:$port');
+        await _httpClient.head(url).timeout(const Duration(seconds: 5));
+        debugPrint('🔥 Web平台预热连接成功: $host:$port');
+      } catch (e) {
+        debugPrint('⚠️ Web平台预热连接失败: $host:$port - $e');
+      }
+    } else {
+      // 移动平台使用Socket连接
+      try {
+        final socket = await Socket.connect(host, port, timeout: _connectionTimeout);
+        await socket.close();
+        debugPrint('🔥 预热连接成功: $host:$port');
+      } catch (e) {
+        debugPrint('⚠️ 预热连接失败: $host:$port - $e');
+      }
     }
   }
   

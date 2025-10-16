@@ -154,7 +154,7 @@ class _PetIdCardState extends State<PetIdCard>
         ),
         const SizedBox(width: 12),
         Text(
-          '宠物身份证',
+          '我的身份证',
           style: TextStyle(
             color: Colors.white,
             fontSize: 24,
@@ -225,13 +225,13 @@ class _PetIdCardState extends State<PetIdCard>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow('姓名', widget.petProfile.name),
+        _buildInfoRow('我叫', widget.petProfile.name),
         const SizedBox(height: 8),
-        _buildInfoRow('品种', widget.petProfile.breed),
+        _buildInfoRow('我是', widget.petProfile.breed),
         const SizedBox(height: 8),
         _buildInfoRow('性别', widget.petProfile.gender),
         const SizedBox(height: 8),
-        _buildInfoRow('年龄', '${widget.petProfile.age}岁'),
+        _buildInfoRow('我今年', '${widget.petProfile.age}岁'),
         const SizedBox(height: 8),
         _buildInfoRow('体重', '${widget.petProfile.weight.toStringAsFixed(1)}kg'),
       ],
@@ -283,7 +283,7 @@ class _PetIdCardState extends State<PetIdCard>
               ),
               const SizedBox(width: 8),
               Text(
-                '证件信息',
+                '我的证件信息',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -293,9 +293,9 @@ class _PetIdCardState extends State<PetIdCard>
             ],
           ),
           const SizedBox(height: 12),
-          _buildCertificateRow('芯片编号', widget.petProfile.chipId ?? 'CHN${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}'),
+          _buildCertificateRow('我的芯片编号', widget.petProfile.chipId),
           const SizedBox(height: 6),
-          _buildCertificateRow('登记日期', _formatDate(widget.petProfile.createdAt)),
+          _buildCertificateRow('我的登记日期', _formatDate(widget.petProfile.createdAt)),
           const SizedBox(height: 6),
           _buildCertificateRow('有效期至', _formatDate(widget.petProfile.createdAt.add(const Duration(days: 365 * 10)))),
         ],

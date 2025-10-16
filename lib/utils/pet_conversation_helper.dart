@@ -44,7 +44,7 @@ class PetConversationHelper {
     } else if (cleanTitle.contains('旅行') || cleanTitle.contains('出行')) {
       return '主人~ 准备和我们的小伙伴一起出门冒险吗？';
     } else if (cleanTitle.contains('毛发') || cleanTitle.contains('毛色')) {
-      return '主人~ 我们小可爱的毛毛好漂亮呀！';
+      return '主人~ 我们小可爱的泡泡好漂亮呀！';
     } else if (cleanTitle.contains('眼睛') || cleanTitle.contains('眼部')) {
       return '主人~ 我们小宝贝的这双小眼睛真是太有神了！';
     } else if (cleanTitle.contains('失败') || cleanTitle.contains('错误')) {

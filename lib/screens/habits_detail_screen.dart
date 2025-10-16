@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/nothing_theme.dart';
+import '../widgets/unified_app_bar.dart';
 
 class HabitsDetailScreen extends StatefulWidget {
   const HabitsDetailScreen({super.key});
@@ -13,56 +14,53 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
   
   final List<Map<String, dynamic>> _dailyHabits = [
     {
-      'habit': '晨起散步',
-      'frequency': '每天',
-      'time': '07:00-07:30',
-      'completion': 0.85,
-      'trend': 'up',
+      'name': '晨起散步',
+      'time': '每天 · 07:00-07:30',
       'icon': Icons.directions_walk,
       'color': NothingTheme.success,
-      'category': '运动',
-      'streak': 12,
-      'weeklyGoal': 7,
-      'weeklyCompleted': 6,
+      'completed': true,
     },
     {
-      'habit': '午餐后休息',
-      'frequency': '每天',
-      'time': '13:00-14:00',
-      'completion': 0.92,
-      'trend': 'stable',
-      'icon': Icons.bed,
+      'name': '阅读习惯',
+      'time': '每天 · 21:00-21:30',
+      'icon': Icons.book,
       'color': NothingTheme.info,
-      'category': '休息',
-      'streak': 18,
-      'weeklyGoal': 7,
-      'weeklyCompleted': 6,
+      'completed': false,
     },
     {
-      'habit': '晚间游戏',
-      'frequency': '每天',
-      'time': '19:00-19:30',
-      'completion': 0.78,
-      'trend': 'down',
-      'icon': Icons.sports_esports,
+      'name': '冥想练习',
+      'time': '每天 · 06:30-07:00',
+      'icon': Icons.self_improvement,
       'color': NothingTheme.warning,
-      'category': '娱乐',
-      'streak': 5,
-      'weeklyGoal': 7,
-      'weeklyCompleted': 5,
+      'completed': true,
     },
     {
-      'habit': '定时喂食',
-      'frequency': '每天',
-      'time': '08:00, 18:00',
-      'completion': 0.95,
-      'trend': 'up',
-      'icon': Icons.restaurant,
-      'color': const Color(0xFFE91E63),
-      'category': '饮食',
-      'streak': 25,
-      'weeklyGoal': 14,
-      'weeklyCompleted': 13,
+      'name': '健身锻炼',
+      'time': '每周3次 · 18:00-19:00',
+      'icon': Icons.fitness_center,
+      'color': NothingTheme.error,
+      'completed': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _weeklyInsights = [
+    {
+      'title': '本周表现优秀',
+      'description': '习惯完成率达到87%，比上周提升了7%',
+      'icon': Icons.trending_up,
+      'color': NothingTheme.success,
+    },
+    {
+      'title': '注意保持记录',
+      'description': '已连续记录25天，继续保持良好的记录习惯',
+      'icon': Icons.schedule,
+      'color': NothingTheme.warning,
+    },
+    {
+      'title': '建议调整时间',
+      'description': '晚间习惯完成率较低，建议调整到更合适的时间',
+      'icon': Icons.access_time,
+      'color': NothingTheme.info,
     },
   ];
 
@@ -70,7 +68,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
     {
       'behavior': '活跃度',
       'score': 85,
-      'description': '小白的活跃度较高，喜欢户外活动',
+      'description': '泡泡的性格温和安静，喜欢室内休息',
       'suggestions': ['增加户外运动时间', '提供更多玩具'],
       'icon': Icons.directions_run,
       'color': NothingTheme.success,
@@ -119,26 +117,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
     },
   ];
 
-  final List<Map<String, dynamic>> _weeklyInsights = [
-    {
-      'title': '本周表现优秀',
-      'description': '习惯完成度达到85%，比上周提升了8%',
-      'icon': Icons.trending_up,
-      'color': NothingTheme.success,
-    },
-    {
-      'title': '连续坚持记录',
-      'description': '已连续记录25天，创造了新的个人记录',
-      'icon': Icons.emoji_events,
-      'color': const Color(0xFFFFD84D),
-    },
-    {
-      'title': '需要关注',
-      'description': '晚间游戏时间有所减少，建议增加互动',
-      'icon': Icons.warning,
-      'color': NothingTheme.warning,
-    },
-  ];
+
 
   @override
   void initState() {
@@ -156,51 +135,13 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NothingTheme.background, // 浅灰背景 - 符合设计规范
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD84D), // Nothing黄色 - 符合设计规范
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-              size: 20,
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            const Text(
-              'Felo',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '习惯分析',
-              style: TextStyle(
-                color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
+      appBar: UnifiedAppBar(
+        title: 'Felo 习惯分析',
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.black,
-          unselectedLabelColor: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-          indicatorColor: const Color(0xFFFFD84D), // Nothing黄色 - 符合设计规范
+          unselectedLabelColor: NothingTheme.textSecondary,
+          indicatorColor: const Color(0xFFFFD84D),
           indicatorWeight: 3,
           tabs: const [
             Tab(text: '日常习惯'),
@@ -224,7 +165,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 统计概览卡片
+          // 统计概览卡片 - 简化为与图片一致的样式
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -278,7 +219,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
           
           const SizedBox(height: 24),
           
-          // 每周洞察
+          // 每周洞察 - 简化标题样式
           const Text(
             '本周洞察',
             style: TextStyle(
@@ -362,7 +303,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
           
           const SizedBox(height: 24),
           
-          // 习惯列表
+          // 习惯列表 - 简化标题样式
           const Text(
             '日常习惯',
             style: TextStyle(
@@ -387,7 +328,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
           
           const SizedBox(height: 24),
           
-          // 快捷操作
+          // 快捷操作 - 使用与档案界面一致的按钮样式
           Row(
             children: [
               Expanded(
@@ -435,6 +376,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
                   ),
                 ),
               ),
+ 
             ],
           ),
         ],
@@ -509,7 +451,7 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  '小白的整体表现优秀，各项行为指标均在良好范围内',
+                  '泡泡的整体表现优秀，各项行为指标均在良好范围内',
                   style: TextStyle(
                     fontSize: 14,
                     color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
@@ -549,55 +491,12 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
     );
   }
 
-  Widget _buildHabitStat(String label, String value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildHabitCard(Map<String, dynamic> habit) {
-    IconData trendIcon = Icons.trending_flat;
-    Color trendColor = NothingTheme.textSecondary; // 中灰色 - 符合设计规范
-    
-    switch (habit['trend']) {
-      case 'up':
-        trendIcon = Icons.trending_up;
-        trendColor = NothingTheme.success;
-        break;
-      case 'down':
-        trendIcon = Icons.trending_down;
-        trendColor = NothingTheme.error;
-        break;
-      case 'stable':
-        trendIcon = Icons.trending_flat;
-        trendColor = NothingTheme.info;
-        break;
-    }
-
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -606,118 +505,92 @@ class _HabitsDetailScreenState extends State<HabitsDetailScreen> with TickerProv
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: habit['color'].withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  habit['icon'],
-                  color: habit['color'],
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      habit['habit'],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      habit['category'],
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                children: [
-                  Icon(
-                    trendIcon,
-                    color: trendColor,
-                    size: 20,
-                  ),
-                  Text(
-                    '${habit['streak']}天',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: trendColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          // 习惯图标
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: habit['color'].withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Icon(
+              habit['icon'],
+              color: habit['color'],
+              size: 24,
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                Icons.schedule,
-                size: 16,
-                color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${habit['frequency']} · ${habit['time']}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Text(
-                '本周进度',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: NothingTheme.textSecondary, // 中灰色 - 符合设计规范
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: LinearProgressIndicator(
-                  value: habit['completion'],
-                  backgroundColor: NothingTheme.textSecondary.withValues(alpha: 0.2),
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    habit['completion'] >= 0.8 ? NothingTheme.success : 
-                    habit['completion'] >= 0.6 ? NothingTheme.warning : NothingTheme.error,
+          
+          const SizedBox(width: 16),
+          
+          // 习惯信息
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  habit['name'],
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${habit['weeklyCompleted']}/${habit['weeklyGoal']}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                const SizedBox(height: 4),
+                Text(
+                  habit['time'],
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: NothingTheme.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ),
+          
+          // 完成状态指示器
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: habit['completed'] ? NothingTheme.success : Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: habit['completed']
+                ? const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 18,
+                  )
+                : null,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHabitStat(String label, String value, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: NothingTheme.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/nothing_theme.dart';
+import '../widgets/unified_app_bar.dart';
 
 class ReminderScreen extends StatefulWidget {
   const ReminderScreen({super.key});
@@ -13,7 +14,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
     {
       'id': '1',
       'title': '疫苗接种提醒',
-      'description': '小白的狂犬病疫苗即将到期，请及时预约接种',
+      'description': '泡泡的狂犬病疫苗即将到期，请及时预约接种',
       'time': '2024-01-20 09:00',
       'type': 'health',
       'priority': 'high',
@@ -24,7 +25,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
     {
       'id': '2',
       'title': '喂食提醒',
-      'description': '该给小白喂晚餐了',
+      'description': '该给泡泡喂晚餐了',
       'time': '2024-01-15 18:00',
       'type': 'daily',
       'priority': 'medium',
@@ -35,7 +36,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
     {
       'id': '3',
       'title': '体检报告',
-      'description': '小白的体检报告已出，各项指标正常',
+      'description': '泡泡的体检报告已出，各项指标正常',
       'time': '2024-01-14 14:30',
       'type': 'health',
       'priority': 'low',
@@ -57,7 +58,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
     {
       'id': '5',
       'title': '洗澡提醒',
-      'description': '小白已经一周没洗澡了，该给它洗澡了',
+      'description': '泡泡已经一周没洗澡了，该给它洗澡了',
       'time': '2024-01-10 16:00',
       'type': 'daily',
       'priority': 'low',
@@ -68,7 +69,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
     {
       'id': '6',
       'title': '运动提醒',
-      'description': '今天还没有带小白出去散步，记得要运动哦',
+      'description': '今天还没有带泡泡出去散步，记得要运动哦',
       'time': '2024-01-09 19:00',
       'type': 'daily',
       'priority': 'medium',
@@ -110,34 +111,8 @@ class _ReminderScreenState extends State<ReminderScreen> {
     
     return Scaffold(
       backgroundColor: NothingTheme.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: NothingTheme.surfaceTertiary,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              size: 16,
-              color: NothingTheme.textPrimary,
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          '提醒中心',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: NothingTheme.textPrimary,
-          ),
-        ),
-        centerTitle: true,
+      appBar: UnifiedAppBar(
+        title: '提醒中心',
         actions: [
           if (unreadCount > 0)
             Container(

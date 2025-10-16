@@ -11,13 +11,26 @@ class BehaviorFilterChips extends StatefulWidget {
     this.selectedBehavior,
     required this.onBehaviorChanged,
     this.availableBehaviors = const [
-      '进食',
+      // 文档标准分类
+      '观望行为',
+      '探索行为',
+      '领地行为',
+      '玩耍行为',
+      '攻击行为',
+      '无特定行为',
+      '无宠物',
+      // 程序现有分类
       '玩耍',
+      '进食',
+      '睡觉',
       '休息',
       '运动',
-      '清洁',
-      '健康检查',
+      '静止',
+      '发声',
+      '梳理',
+      '探索',
       '社交',
+      '警戒',
       '其他',
     ],
   });
@@ -163,22 +176,48 @@ class _BehaviorFilterChipsState extends State<BehaviorFilterChips> {
 
   IconData _getBehaviorIcon(String behavior) {
     switch (behavior) {
-      case '进食':
-        return Icons.restaurant;
+      // 文档标准分类
+      case '观望行为':
+        return Icons.visibility;
+      case '探索行为':
+        return Icons.explore;
+      case '领地行为':
+        return Icons.home;
+      case '玩耍行为':
+        return Icons.sports_esports;
+      case '攻击行为':
+        return Icons.warning;
+      case '无特定行为':
+        return Icons.remove_circle_outline;
+      case '无宠物':
+        return Icons.not_interested;
+      
+      // 程序现有分类
       case '玩耍':
         return Icons.sports_esports;
-      case '休息':
+      case '进食':
+        return Icons.restaurant;
+      case '睡觉':
         return Icons.bedtime;
+      case '休息':
+        return Icons.chair;
       case '运动':
         return Icons.directions_run;
-      case '清洁':
+      case '静止':
+        return Icons.pause_circle_outline;
+      case '发声':
+        return Icons.volume_up;
+      case '梳理':
         return Icons.cleaning_services;
-      case '健康检查':
-        return Icons.health_and_safety;
+      case '探索':
+        return Icons.search;
       case '社交':
         return Icons.people;
+      case '警戒':
+        return Icons.security;
       case '其他':
         return Icons.more_horiz;
+      
       default:
         return Icons.pets;
     }

@@ -451,7 +451,7 @@ export function HomeTemplate({ onNavigate }: HomeTemplateProps) {
           </Card>
 
           <Card
-            onClick={() => onNavigate('life-records')}
+            onClick={() => onNavigate('optimized-life-records')}
             className="p-4 bg-white cursor-pointer transition-all"
             style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)' }}
           >
@@ -461,11 +461,11 @@ export function HomeTemplate({ onNavigate }: HomeTemplateProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-caption text-[#424242]" style={{ fontWeight: 600 }}>生活记录</h4>
-                <p className="text-caption text-[#BDBDBD]">照片·活动</p>
+                <p className="text-caption text-[#BDBDBD]">文件上传·管理</p>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-caption text-[#9E9E9E]">46张照片</span>
+              <span className="text-caption text-[#9E9E9E]">支持文件上传</span>
               <ChevronRight className="w-4 h-4 text-[#E0E0E0]" strokeWidth={1.5} />
             </div>
           </Card>

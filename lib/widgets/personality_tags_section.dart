@@ -15,7 +15,7 @@ class PersonalityTagsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '性格特征',
+          '我的性格特征',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -54,7 +54,7 @@ class PersonalityTagsSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '性格词云',
+                    '我的性格词云',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -72,7 +72,7 @@ class PersonalityTagsSection extends StatelessWidget {
               const SizedBox(height: 16),
               
               Text(
-                '基于日常行为分析生成的性格特征标签',
+                '这些是根据我的日常行为分析出来的性格特征哦～',
                 style: TextStyle(
                   fontSize: 12,
                   color: NothingTheme.textSecondary,
@@ -91,7 +91,7 @@ class PersonalityTagsSection extends StatelessWidget {
         height: 120,
         alignment: Alignment.center,
         child: Text(
-          '暂无性格标签',
+          '我还在展现我的性格特点...',
           style: TextStyle(
             fontSize: 14,
             color: NothingTheme.textSecondary,

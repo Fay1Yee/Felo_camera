@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -23,6 +23,7 @@ import '../services/realtime_analyzer.dart';
 import '../services/history_manager.dart';
 import '../services/performance_manager.dart';
 import '../services/confidence_manager.dart';
+import '../services/permission_manager.dart';
 import '../screens/settings_screen.dart';
 import '../screens/history_screen.dart';
 import 'overlay/top_tag.dart';
@@ -151,19 +152,18 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     }
 
     try {
-      // 并行执行权限请求和相机列表获取，提升初始化速度
-      final futures = await Future.wait([
-        Permission.camera.request(),
-        availableCameras(),
-      ]);
+      // 使用权限管理器请求相机权限
+      final hasPermission = await PermissionManager.instance.requestCameraPermission(
+        context: context,
+      );
       
-      final cameraStatus = futures[0] as PermissionStatus;
-      if (!cameraStatus.isGranted) {
+      if (!hasPermission) {
         _showError('需要相机权限才能使用此功能');
         return;
       }
 
-      _cameras = futures[1] as List<CameraDescription>;
+      // 获取可用相机列表
+      _cameras = await availableCameras();
       _availableCameras = _cameras ?? [];
 
       if (_availableCameras.isEmpty) {

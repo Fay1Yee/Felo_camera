@@ -38,7 +38,7 @@ class _HealthOverviewWidgetState extends State<HealthOverviewWidget> {
     return HealthReport(
       petId: widget.petId,
       timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      petName: '小橘',
+      petName: '泡泡',
       petType: '猫',
       breed: '英短',
       physicalIndicators: PhysicalIndicators(

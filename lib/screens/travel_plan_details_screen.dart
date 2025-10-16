@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../config/nothing_theme.dart';
-import '../models/pet_profile.dart';
 
 /// 出行计划状态
 enum TravelPlanStatus {

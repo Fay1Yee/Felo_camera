@@ -601,7 +601,7 @@ class _LifeRecordsScreenState extends State<LifeRecordsScreen>
       return _isSameDay(record.timestamp, _selectedDate);
     }).toList();
 
-    todayRecords.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    todayRecords.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -758,34 +758,46 @@ class _LifeRecordsScreenState extends State<LifeRecordsScreen>
   Widget _buildRecordItem(LifeRecord record) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: NothingTheme.surface,
-        borderRadius: BorderRadius.circular(NothingTheme.radiusMd),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: NothingTheme.gray200,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: NothingTheme.blackAlpha05,
+            color: NothingTheme.gray900.withValues(alpha: 0.05),
             blurRadius: 4,
-            offset: const Offset(0, 1),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            // TODO: 显示记录详情
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: record.type.color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
+                  color: record.type.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: Icon(
                   record.type.icon,
                   color: record.type.color,
-                  size: 20,
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 12),
@@ -800,7 +812,7 @@ class _LifeRecordsScreenState extends State<LifeRecordsScreen>
                           record.title,
                           style: const TextStyle(
                             color: NothingTheme.textPrimary,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -828,7 +840,7 @@ class _LifeRecordsScreenState extends State<LifeRecordsScreen>
                       _formatTime(record.timestamp),
                       style: TextStyle(
                         color: NothingTheme.textSecondary,
-                        fontSize: 12,
+                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -892,21 +904,25 @@ class _LifeRecordsScreenState extends State<LifeRecordsScreen>
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: NothingTheme.gray100,
-                    borderRadius: BorderRadius.circular(NothingTheme.radiusSm),
+                    color: NothingTheme.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     tag,
                     style: TextStyle(
-                      color: NothingTheme.textSecondary,
-                      fontSize: 10,
+                      color: NothingTheme.info,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 );
               }).toList(),
             ),
           ],
-        ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -1,0 +1,1298 @@
+[
+  {
+    "timestamp": "2025-10-13 19:50:51",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 1.0,
+      "reasons": "在提供的图像中未检测到猫的存在，画面主要展示了一只狗和室内环境。"
+    },
+    "import_time": "2025-10-15T20:07:31.540468",
+    "record_id": "import_1"
+  },
+  {
+    "timestamp": "2025-10-13 19:50:57",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫站立在室内，头部和身体朝向左侧，眼睛注视着某个方向，姿态警觉，表现出观望行为。周围环境为家庭室内场景，猫未表现出明显的探索、攻击或领地行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540481",
+    "record_id": "import_2"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:02",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中移动，身体朝向不同方向，尾巴轻微摆动，显示出对周围环境的主动嗅探和巡视行为。背景中的家具和物品表明这是一个新或变化的环境，猫正在通过移动和嗅闻来熟悉该空间。"
+    },
+    "import_time": "2025-10-15T20:07:31.540485",
+    "record_id": "import_3"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:07",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.95,
+      "reasons": "画面中未检测到猫的存在，仅显示一个带有视频缩略图的屏幕界面，无法观察到任何猫的行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540487",
+    "record_id": "import_4"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:13",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫趴在蓝色床单上，头部转向左侧，眼睛注视着画面外的方向。其身体姿态放松，但头部和视线保持警觉，表现出观望的行为特征。周围环境安静，未见明显干扰因素。"
+    },
+    "import_time": "2025-10-15T20:07:31.540490",
+    "record_id": "import_5"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:19",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "画面中一只浅色的狗在室内环境中移动，头部低垂并嗅探地面，显示出对周围环境的好奇和探索行为。它从床边缓慢走向房间中央，姿态放松但专注，表明其正在巡视和感知新环境。"
+    },
+    "import_time": "2025-10-15T20:07:31.540492",
+    "record_id": "import_6"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:24",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，身体朝向左侧并嗅探地面。其姿态表明它正在巡视房间，对周围环境表现出好奇和警觉，符合探索行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540494",
+    "record_id": "import_7"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:29",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫安静地躺在蓝色的垫子上，身体放松，姿态稳定，长时间占据该位置，表现出对领地的占有和休息状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540496",
+    "record_id": "import_8"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:34",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫安静地躺在蓝色的毛绒垫子上，身体放松，姿态稳定。它占据了这个垫子，没有表现出明显的移动或探索行为，符合长时间占据某个位置的特征，属于领地行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540498",
+    "record_id": "import_9"
+  },
+  {
+    "timestamp": "2025-10-13 19:51:39",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.99,
+      "reasons": "在提供的三帧图像中，画面显示的是一个电子设备的屏幕界面，内容为视频推荐页面。屏幕上未检测到任何猫的存在，因此判断为无宠物。"
+    },
+    "import_time": "2025-10-15T20:07:31.540501",
+    "record_id": "import_10"
+  },
+  {
+    "timestamp": "2025-10-13 19:53:37",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫处于静止状态，头部微微转动，眼睛专注地注视着前方。其身体姿态放松，但警觉性较高，表现出对周围环境的观察行为。背景中可见猫窝，但猫并未占据该位置，而是保持观望状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540506",
+    "record_id": "import_11"
+  },
+  {
+    "timestamp": "2025-10-13 19:53:43",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于画面中央，身体姿态稳定，头部朝向镜头方向，眼睛清晰可见且专注。其尾巴未出现炸立或摆动等紧张或攻击性表现，整体状态显示为警觉地观察周围环境，符合‘观望’行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540508",
+    "record_id": "import_12"
+  },
+  {
+    "timestamp": "2025-10-13 19:53:48",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于画面中央，身体保持相对静止，头部微微转动，眼睛直视前方，表现出警觉和观察的状态。其姿态表明它正在关注周围的环境或潜在的刺激物，但没有明显的移动或攻击性行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540510",
+    "record_id": "import_13"
+  },
+  {
+    "timestamp": "2025-10-13 19:53:53",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在床单上缓慢移动，头部不断左右转动并嗅探地面。其身体姿态活跃，尾巴竖起且毛发略显蓬松，显示出对周围环境的好奇和探索行为。背景中可见床单的纹理和图案，猫的行为集中在对这一新环境的巡视和感知。"
+    },
+    "import_time": "2025-10-15T20:07:31.540512",
+    "record_id": "import_14"
+  },
+  {
+    "timestamp": "2025-10-13 19:53:58",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫站立在平面上，头部微微转动，眼睛直视前方，耳朵竖起，表现出警觉和观察周围环境的行为。其身体姿态稳定，没有明显的移动或攻击迹象，整体状态为观望。"
+    },
+    "import_time": "2025-10-15T20:07:31.540514",
+    "record_id": "import_15"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:03",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在床单上缓慢移动，头部不断转向不同方向，眼睛注视着周围环境，表现出对新环境的嗅探和巡视行为。其身体姿态低伏，尾巴未明显炸立，整体动作流畅且有目的性，符合探索行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540515",
+    "record_id": "import_16"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:08",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫趴在柔软的表面上，身体放松，但头部微微抬起，眼睛睁大并直视前方，表现出警觉和观察的状态。其姿态表明它正在留意周围环境或关注某个特定目标，符合‘观望’行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540517",
+    "record_id": "import_17"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:13",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "图像显示的是一台电子设备的屏幕，屏幕上播放着与猫相关的视频内容，但未检测到实际的猫。屏幕表面有反光和污渍，无法观察到任何猫的行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540519",
+    "record_id": "import_18"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:18",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "在提供的三帧图像中，未检测到任何猫的存在。画面主要显示了户外环境，包括地面、植物和建筑物，但没有发现猫的踪迹。"
+    },
+    "import_time": "2025-10-15T20:07:31.540521",
+    "record_id": "import_19"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:24",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "在提供的三帧图像中，未检测到任何猫的存在。画面主要显示了室内环境，包括天花板、灯光和部分窗外的树木，但没有发现猫的踪迹。"
+    },
+    "import_time": "2025-10-15T20:07:31.540522",
+    "record_id": "import_20"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:29",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.95,
+      "reasons": "在连续的三帧图像中，未检测到猫的存在。画面主要显示一台电脑屏幕，屏幕上显示着网页内容，背景为室内环境，但没有猫的任何动作或形态出现。"
+    },
+    "import_time": "2025-10-15T20:07:31.540526",
+    "record_id": "import_21"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:34",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于画面中央，身体姿态稳定，头部和眼睛持续朝向镜头方向，表现出警觉和观察的状态。其耳朵竖起，瞳孔放大，尾巴自然下垂但未出现攻击或紧张的迹象，整体行为符合观望特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540528",
+    "record_id": "import_22"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:39",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫趴在笔记本电脑屏幕上，身体舒展，姿态放松，长时间占据该位置，表现出对屏幕这一空间的占有行为，符合领地行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540530",
+    "record_id": "import_23"
+  },
+  {
+    "timestamp": "2025-10-13 19:54:44",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "在提供的三帧图像中，未检测到任何猫的存在。画面主要显示了一个倾斜的电脑屏幕和模糊的背景环境，没有可见的动物活动或形态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540531",
+    "record_id": "import_24"
+  },
+  {
+    "timestamp": "2025-10-13 19:55:58",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.92,
+      "reasons": "猫在地面上快速滚动和扭动身体，四肢伸展且动作幅度较大，表现出典型的玩耍行为。背景中可见户外的长椅和地面，环境开阔，猫的行为未受明显限制，进一步支持其处于玩耍状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540533",
+    "record_id": "import_25"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:03",
+    "category": "attack",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "攻击",
+      "confidence": 0.92,
+      "reasons": "画面中两只猫表现出明显的攻击性行为。一只橙色猫和一只黑色猫相互靠近，姿态紧张，身体低伏，头部朝向对方，似乎在对峙或准备发起攻击。背景中可见车辆轮胎，表明场景可能在室外或车库等开放空间。整体氛围紧张，符合攻击行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540535",
+    "record_id": "import_26"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:08",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.92,
+      "reasons": "猫在地面上进行互动行为，身体姿态活跃，尾巴摆动明显，两只猫相互靠近并有肢体接触，表现出典型的玩耍行为特征。地面为瓷砖材质，环境安静，无其他干扰因素。"
+    },
+    "import_time": "2025-10-15T20:07:31.540536",
+    "record_id": "import_27"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:14",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "画面中两只猫均处于静止状态。黑色猫平躺在地面上，头部抬起，眼睛直视前方；棕色猫站立在旁边，身体朝向黑色猫，头部也转向同一方向。两者姿态放松但警觉，表现出对周围环境的关注和观察行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540538",
+    "record_id": "import_28"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:19",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "画面中有两只猫，一只位于前景，另一只位于背景。前景的猫头部转向右侧，身体保持静止，似乎在观察背景中的另一只猫。背景中的猫也保持相对静止的姿态，两者之间没有明显的互动或动态行为，整体呈现出一种观望的状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540540",
+    "record_id": "import_29"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:25",
+    "category": "attack",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "攻击",
+      "confidence": 0.92,
+      "reasons": "画面中两只橘猫表现出明显的攻击性行为。第一帧中，一只猫高高跃起，姿态紧张；第二帧中，两只猫相互对峙，身体紧绷，尾巴竖立；第三帧中，它们继续保持警惕的姿势，头部朝向对方，显示出潜在的冲突状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540542",
+    "record_id": "import_30"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:29",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "画面中两只猫均处于静止状态，其中一只浅色猫面向右侧，另一只橘色猫背对镜头，两者都注视着同一方向。它们的姿态表明正在观察周围环境或某物，符合‘观望’行为的定义。"
+    },
+    "import_time": "2025-10-15T20:07:31.540545",
+    "record_id": "import_31"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:34",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.95,
+      "reasons": "画面中两只橘猫在地板上相互嬉戏打闹，一只猫仰面躺着，另一只猫压在其身上，四肢活动频繁，尾巴摆动，表现出典型的玩耍行为。周围环境为室内地面，无其他干扰因素，猫的动作连贯且充满活力。"
+    },
+    "import_time": "2025-10-15T20:07:31.540547",
+    "record_id": "import_32"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:40",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "画面中两只橘猫处于室内环境中，一只猫背对镜头静止不动，另一只猫面向它并保持警惕姿态。两只猫均未表现出明显的移动或互动行为，而是相互注视，呈现出观望的状态。背景中可见家具和墙壁，环境安静，猫的行为主要集中在观察对方。"
+    },
+    "import_time": "2025-10-15T20:07:31.540548",
+    "record_id": "import_33"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:45",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.95,
+      "reasons": "画面中两只猫（一只橘色，一只白色带灰色斑块）正在互动，姿态活泼，互相推搡、扑咬。它们的动作连贯且具有攻击性但无明显敌意，符合典型的玩耍行为特征。背景为室外台阶，环境开阔，未见其他干扰因素。"
+    },
+    "import_time": "2025-10-15T20:07:31.540550",
+    "record_id": "import_34"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:50",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.92,
+      "reasons": "猫在地面上进行翻滚、扭动身体等动作，尾巴摆动明显，表现出典型的玩耍行为。其姿态活跃且无攻击性，周围环境为室内地面，未见其他干扰因素。"
+    },
+    "import_time": "2025-10-15T20:07:31.540552",
+    "record_id": "import_35"
+  },
+  {
+    "timestamp": "2025-10-13 19:56:56",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "在连续的三帧图像中，一只猫在地面上缓慢移动并嗅探周围环境。其头部低垂，身体姿态表明它正在仔细观察和探索该区域。背景中可见蓝色塑料凳、白色卷状物等物品，猫的行为与巡视新环境或寻找感兴趣的事物相符，整体表现出典型的探索行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540553",
+    "record_id": "import_36"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:01",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "攻击",
+      "confidence": 0.95,
+      "reasons": "画面中两只猫处于对峙状态，右侧的灰色猫姿态紧张，尾毛炸立，张开嘴巴露出牙齿并挥动前爪，表现出明显的攻击性行为；左侧的橘色猫则面向对方，保持警惕姿态。两者之间的互动表明存在冲突或领地争夺，符合攻击行为的定义。"
+    },
+    "import_time": "2025-10-15T20:07:31.540555",
+    "record_id": "import_37"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:06",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在地面上缓慢移动，头部不断向下嗅探，显示出对环境的好奇和探索行为。其身体姿态放松但专注，尾巴未见明显炸立或摆动，整体动作表明它正在巡视和感知周围的新环境。"
+    },
+    "import_time": "2025-10-15T20:07:31.540557",
+    "record_id": "import_38"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:11",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于室内，身体朝向窗户方向，头部微微抬起并注视窗外。其姿态静止，尾巴自然下垂，表现出警觉和观察的行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540558",
+    "record_id": "import_39"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:16",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "攻击",
+      "confidence": 0.95,
+      "reasons": "猫的身体姿态紧张，前爪伸出并挥动，尾巴毛发竖立，表现出明显的攻击性行为。背景中可见室内环境，猫正对着一个方向做出攻击动作。"
+    },
+    "import_time": "2025-10-15T20:07:31.540560",
+    "record_id": "import_40"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:22",
+    "category": "play",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.95,
+      "reasons": "两只橘猫在室内地板上进行互动，其中一只猫仰面躺着并挥动四肢，另一只猫则靠近它并做出类似推搡的动作。它们的姿态和动作表明正在进行嬉戏打闹，符合典型的玩耍行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540564",
+    "record_id": "import_41"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:27",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "两只猫在相对静止的状态下相互对视，身体姿态放松但头部和眼睛专注于对方，表现出观察和警惕的行为特征。背景为室内环境，光线充足，猫的注意力集中在彼此身上，未表现出明显的攻击或玩耍意图。"
+    },
+    "import_time": "2025-10-15T20:07:31.540566",
+    "record_id": "import_42"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:32",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于显示器前，身体静止，头部朝向屏幕方向，姿态放松但专注，表现出对屏幕内容的观察行为。背景为电脑桌面，环境安静，猫未表现出其他明显动作。"
+    },
+    "import_time": "2025-10-15T20:07:31.540567",
+    "record_id": "import_43"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:37",
+    "category": "attack",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "攻击",
+      "confidence": 0.92,
+      "reasons": "画面中两只猫姿态紧张，身体前倾，尾巴竖起且毛发炸立。其中一只猫正对着另一只猫做出挥爪动作，表现出明显的攻击性行为。背景为室内地面，光线充足，猫的动作清晰可见。"
+    },
+    "import_time": "2025-10-15T20:07:31.540569",
+    "record_id": "import_44"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:42",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在红色波纹状的地面上缓慢移动，头部不断左右转动并嗅探地面，表现出对新环境的好奇和探索行为。背景中可见绿色植物，进一步表明猫正在巡视一个开阔的户外区域。"
+    },
+    "import_time": "2025-10-15T20:07:31.540571",
+    "record_id": "import_45"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:48",
+    "category": "play",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "玩耍",
+      "confidence": 0.92,
+      "reasons": "猫在画面中表现出明显的动态行为，身体呈弓形，四肢伸展，尾巴轻微摆动。其姿态和动作显示出兴奋和活跃的状态，符合玩耍的特征。背景为模糊的条纹状表面，猫的动作集中在该区域，进一步确认了其玩耍的行为模式。"
+    },
+    "import_time": "2025-10-15T20:07:31.540573",
+    "record_id": "import_46"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:53",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "在提供的三帧图像中，均未检测到猫的存在。画面主要显示了室内环境和人物，但没有猫的任何迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540575",
+    "record_id": "import_47"
+  },
+  {
+    "timestamp": "2025-10-13 19:57:58",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.95,
+      "reasons": "在连续的三帧图像中，画面主要显示了天花板和墙壁等静态环境，未检测到猫的存在或其任何明显动作。最后一帧右下角隐约可见疑似毛发的物体，但无法确认为猫的行为，因此判定为无特定行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540577",
+    "record_id": "import_48"
+  },
+  {
+    "timestamp": "2025-10-13 20:21:30",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.95,
+      "reasons": "橘色虎斑猫安静地趴在椅子上，身体舒展，头部枕在椅垫上，姿态放松且稳定。它长时间占据该位置，表现出对特定物品（椅子）的占有和依赖，符合‘领地’行为的特征。周围环境安静，无明显干扰，进一步强化了其处于领地状态的判断。"
+    },
+    "import_time": "2025-10-15T20:07:31.540579",
+    "record_id": "import_49"
+  },
+  {
+    "timestamp": "2025-10-13 20:21:34",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫长时间占据椅子座位，身体舒展且保持静止，表现出对特定位置的占有行为。周围环境安静，未观察到其他显著活动，进一步确认其处于领地状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540581",
+    "record_id": "import_50"
+  },
+  {
+    "timestamp": "2025-10-13 20:21:39",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫安静地躺在椅子上，身体舒展，姿态放松，长时间占据该位置，表现出对领地的占有和舒适状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540585",
+    "record_id": "import_51"
+  },
+  {
+    "timestamp": "2025-10-13 20:21:45",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.95,
+      "reasons": "猫安静地躺在蓝色的椅子上，身体舒展，姿态放松，长时间占据该位置。周围环境未见明显干扰，猫表现出对当前空间的占有和舒适状态，符合‘领地’行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540587",
+    "record_id": "import_52"
+  },
+  {
+    "timestamp": "2025-10-13 20:21:50",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "橘色虎斑猫长时间占据椅子座位，身体舒展且保持静止状态，表现出对特定位置的占有行为，符合‘领地’特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540588",
+    "record_id": "import_53"
+  },
+  {
+    "timestamp": "2025-10-13 20:21:55",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在椅子上，身体完全放松，头部靠近身体，处于典型的睡眠姿态。周围环境安静，没有明显的外界刺激，猫表现出深度休息的状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540590",
+    "record_id": "import_54"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:01",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，头部低垂并不断嗅探地面。其身体姿态放松但专注，尾巴自然下垂，显示出对周围环境的好奇和巡视行为。背景中的家具（如椅子）未被占据，进一步表明猫正在主动探索而非停留在固定位置。"
+    },
+    "import_time": "2025-10-15T20:07:31.540592",
+    "record_id": "import_55"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:06",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中，位于椅子下方，身体呈低姿态，头部和前爪向前移动，表现出对周围环境的嗅探和巡视行为。其动作缓慢且专注，符合探索行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540593",
+    "record_id": "import_56"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:11",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.95,
+      "reasons": "猫长时间占据椅子座位，身体舒展且保持静止，表现出对特定位置的占有行为。周围环境安静，未观察到其他明显活动，进一步确认其处于领地行为状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540595",
+    "record_id": "import_57"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:17",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫呈蜷缩姿势躺在椅子上，身体放松，眼睛闭合，处于典型的睡眠状态。周围环境安静，没有明显活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540597",
+    "record_id": "import_58"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:22",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在椅子上，身体放松，头部贴近椅面，四肢静止，表现出典型的睡眠姿态。周围环境安静，未观察到任何移动或警觉行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540599",
+    "record_id": "import_59"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:27",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "一只橘猫长时间占据蓝色椅子，身体舒展地躺在椅面上，姿态放松且稳定，显示出对特定位置的占有行为。周围环境安静，猫未表现出其他明显活动，符合‘领地’行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540600",
+    "record_id": "import_60"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:32",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，头部靠近椅背，处于典型的睡眠姿态。周围环境安静，没有明显活动迹象，表明猫正在休息。"
+    },
+    "import_time": "2025-10-15T20:07:31.540603",
+    "record_id": "import_61"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:38",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子的椅垫上，身体完全放松，头部贴近椅面，姿态表明其处于深度睡眠状态。周围环境安静，无明显干扰，进一步支持该判断。"
+    },
+    "import_time": "2025-10-15T20:07:31.540605",
+    "record_id": "import_62"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:43",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.95,
+      "reasons": "猫安静地蜷缩在蓝色椅子上，身体姿态放松但占据了一个固定位置，表现出对这个空间的占有和舒适感，符合领地行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540606",
+    "record_id": "import_63"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:48",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫坐在蓝色椅子上，身体保持静止，头部转向左侧，耳朵竖起，眼睛注视着某个方向。其姿态表明它正在观察周围环境，但没有明显的移动或攻击性行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540608",
+    "record_id": "import_64"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:54",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，头部靠近身体，处于典型的睡眠姿态。周围环境安静，没有明显的外界刺激，猫表现出深度休息的状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540610",
+    "record_id": "import_65"
+  },
+  {
+    "timestamp": "2025-10-13 20:22:59",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫安静地趴在蓝色椅子上，身体放松，头部微微转动观察周围环境。它长时间占据该位置，表现出对特定区域的占有和舒适感，符合领地行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540612",
+    "record_id": "import_66"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:04",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，头部靠近椅面，处于典型的睡眠姿态。周围环境安静，猫没有表现出其他明显的行为迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540613",
+    "record_id": "import_67"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:10",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，姿态静止，符合典型的睡眠行为特征。周围环境安静，未观察到任何移动或警觉性动作。"
+    },
+    "import_time": "2025-10-15T20:07:31.540615",
+    "record_id": "import_68"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:15",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫呈蜷缩姿势躺在椅子上，身体放松，眼睛闭合，处于典型的睡眠状态。周围环境安静，没有明显的外界刺激，进一步支持其正在休息的判断。"
+    },
+    "import_time": "2025-10-15T20:07:31.540616",
+    "record_id": "import_69"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:21",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在椅子上，身体完全放松，头部靠近椅背，姿态表明其处于休息或睡眠状态。周围环境安静，没有明显的活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540618",
+    "record_id": "import_70"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:25",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，眼睛闭合，处于典型的睡眠姿态。周围环境安静，没有明显干扰，表明猫正在休息。"
+    },
+    "import_time": "2025-10-15T20:07:31.540621",
+    "record_id": "import_71"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:31",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫呈蜷缩姿势躺在椅子上，身体放松，眼睛闭合，处于典型的睡眠状态。周围环境安静，没有明显活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540623",
+    "record_id": "import_72"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:36",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.9,
+      "reasons": "在连续的三帧图像中，猫的存在非常模糊且难以辨认。画面主要显示的是室内环境，包括蓝色椅子和部分家具，但猫的具体动作不清晰，无法判断其处于何种行为状态。"
+    },
+    "import_time": "2025-10-15T20:07:31.540624",
+    "record_id": "import_73"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:42",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "橘猫长时间占据蓝色椅子，身体舒展地躺在上面，尾巴自然垂下，表现出对特定位置的占有和放松状态，符合领地行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540628",
+    "record_id": "import_74"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:47",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫呈蜷缩姿势躺在蓝色椅子上，身体放松，眼睛闭合，处于典型的睡眠状态。周围环境安静，未观察到明显活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540630",
+    "record_id": "import_75"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:53",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，身体朝向左侧并低头嗅探地面。其姿态表明它正在巡视周围环境，表现出典型的探索行为。背景中可见餐桌和椅子，猫在这些家具之间穿行，进一步证实了其探索的意图。"
+    },
+    "import_time": "2025-10-15T20:07:31.540632",
+    "record_id": "import_76"
+  },
+  {
+    "timestamp": "2025-10-13 20:23:58",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中，位于椅子之间，身体呈低姿态并缓慢移动。其头部不断转向不同方向，似乎在嗅探地面和周围环境，表现出典型的探索行为。背景中可见家具和物品，但猫的注意力集中在前方区域，没有表现出攻击、玩耍或躲藏的迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540634",
+    "record_id": "import_77"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:03",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于画面右侧的桌子边缘，身体保持静止，头部朝向左侧，眼睛注视着前方。其姿态表明它正在观察周围环境或关注某个特定方向，符合‘观望’行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540637",
+    "record_id": "import_78"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:09",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在餐桌和椅子之间的区域缓慢移动，头部低垂并不断嗅探地面。其身体姿态表明它正在仔细巡视周围环境，表现出典型的探索行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540638",
+    "record_id": "import_79"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:14",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，头部不断转向不同方向，表现出对周围环境的嗅探和巡视行为。其身体姿态灵活，尾巴轻微摆动，显示出对新环境的好奇和探索意图。"
+    },
+    "import_time": "2025-10-15T20:07:31.540640",
+    "record_id": "import_80"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:20",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于椅子上，身体朝向窗户方向，头部微微转动，姿态警觉。其视线集中在窗外区域，表现出对外界环境的关注和观察行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540644",
+    "record_id": "import_81"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:25",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，身体朝向桌子和椅子区域，头部略微低下，似乎在嗅探地面。其姿态表明它正在巡视周围环境，符合探索行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540645",
+    "record_id": "import_82"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:30",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫站立在桌子边缘，身体朝向窗户方向，头部和视线均集中在窗外区域。其姿态表明它正在观察窗外的动静，尾巴自然下垂，未表现出攻击或紧张的迹象，整体行为符合观望特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540648",
+    "record_id": "import_83"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:35",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，身体朝向桌子，并嗅探地面。其尾巴竖起且轻微摆动，显示出对周围环境的好奇和警觉，符合典型的探索行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540650",
+    "record_id": "import_84"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:41",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中移动，从桌子下方出现并走向窗户方向。其身体姿态活跃，头部和视线朝向前方，表现出对新环境的嗅探和巡视行为，符合探索的定义。"
+    },
+    "import_time": "2025-10-15T20:07:31.540651",
+    "record_id": "import_85"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:46",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中，从窗边移动到桌子上方，并持续嗅探和巡视周围环境。其身体姿态活跃，尾巴竖起，显示出对新环境的好奇和探索行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540653",
+    "record_id": "import_86"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:51",
+    "category": "occupy",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，身体前倾，头部靠近地面和家具边缘，表现出典型的嗅探和巡视行为。其姿态和动作表明它正在对周围环境进行探索，可能是在寻找感兴趣的事物或标记领地。"
+    },
+    "import_time": "2025-10-15T20:07:31.540655",
+    "record_id": "import_87"
+  },
+  {
+    "timestamp": "2025-10-13 20:24:56",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫位于画面右侧边缘，身体部分隐藏在物体后方，头部朝向室内环境，姿态警觉，表现出观望行为。周围环境为室内餐桌区域，光线充足，猫未进行明显移动或互动。"
+    },
+    "import_time": "2025-10-15T20:07:31.540656",
+    "record_id": "import_88"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:01",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在蓝色椅子上缓慢移动，头部不断转向不同方向嗅探，尾巴轻微摆动，表现出对周围环境的好奇和探索行为。背景中可见室内家具和物品，猫的行为集中在对新环境的巡视和感知。"
+    },
+    "import_time": "2025-10-15T20:07:31.540658",
+    "record_id": "import_89"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:06",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫位于蓝色椅子上，身体前倾，头部转向左侧并嗅探地面，随后缓慢移动前爪。其姿态和动作表明它正在对周围环境进行细致的观察和探索，表现出典型的探索行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540660",
+    "record_id": "import_90"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:11",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "舔毛",
+      "confidence": 0.9,
+      "reasons": "猫坐在蓝色椅子上，身体蜷缩，头部靠近腹部并持续用舌头舔舐毛发。其动作连贯且专注，表明正在进行自我清洁行为。周围环境安静，未观察到其他显著活动。"
+    },
+    "import_time": "2025-10-15T20:07:31.540663",
+    "record_id": "import_91"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:17",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫呈蜷缩姿势躺在椅子上，身体放松，眼睛微闭，处于典型的睡眠状态。周围环境安静，未观察到明显活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540665",
+    "record_id": "import_92"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:22",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫安静地躺在蓝色椅子上，身体舒展，姿态放松，长时间占据该位置，表现出对领地的占有和守护行为。周围环境静止，猫未表现出其他明显活动，符合领地行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540666",
+    "record_id": "import_93"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:28",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，眼睛闭合或半闭，处于典型的睡眠姿态。周围环境安静，没有明显活动迹象，表明猫正在休息。"
+    },
+    "import_time": "2025-10-15T20:07:31.540668",
+    "record_id": "import_94"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:33",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "领地",
+      "confidence": 0.9,
+      "reasons": "猫安静地趴在蓝色椅子上，身体舒展，头部微微抬起观察周围环境。它长时间占据该位置，表现出对特定区域的占有和舒适状态，符合领地行为的特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540670",
+    "record_id": "import_95"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:38",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫蜷缩在蓝色椅子上，身体放松，头部靠近椅面，姿态表明其处于休息或睡眠状态。周围环境安静，未观察到明显活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540672",
+    "record_id": "import_96"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:43",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "睡觉",
+      "confidence": 0.95,
+      "reasons": "猫呈蜷缩姿势躺在椅子上，身体放松，眼睛闭合，四肢自然伸展，表现出典型的睡眠状态。周围环境安静，未观察到任何活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540673",
+    "record_id": "import_97"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:48",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫安静地趴在椅子上，头部微微抬起，眼睛注视前方，姿态放松但警觉，表现出观望的行为特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540675",
+    "record_id": "import_98"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:54",
+    "category": "observe",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.95,
+      "reasons": "猫趴在蓝色椅子上，身体放松但头部微微抬起，眼睛注视前方，姿态表明其正在观察周围环境，未表现出明显的探索、攻击或领地行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540676",
+    "record_id": "import_99"
+  },
+  {
+    "timestamp": "2025-10-13 20:25:59",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "在提供的三帧图像中，未检测到任何猫的存在。画面显示的是一个室内环境，包括地板、家具（如沙发和桌子），但没有发现猫的踪迹。"
+    },
+    "import_time": "2025-10-15T20:07:31.540678",
+    "record_id": "import_100"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:04",
+    "category": "explore",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "探索",
+      "confidence": 0.9,
+      "reasons": "猫在室内环境中缓慢移动，身体低伏，头部靠近地面，似乎在嗅探或巡视周围环境。其姿态和动作表明它正在对新区域进行探索，背景中可见家具轮廓，进一步支持了这一判断。"
+    },
+    "import_time": "2025-10-15T20:07:31.540682",
+    "record_id": "import_101"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:10",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "观望",
+      "confidence": 0.9,
+      "reasons": "猫的眼睛睁大，直视镜头方向，头部保持相对静止，表现出警觉和观察的状态。背景中可见室内环境，但猫的注意力集中在前方，未表现出探索、攻击或其他明显行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540683",
+    "record_id": "import_102"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:15",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.9,
+      "reasons": "在连续的三帧图像中，猫的位置和姿态基本保持静止，未观察到明显的移动、嗅探或其他动态行为。环境光线较暗，猫处于相对静止的状态，因此判断为无特定行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540685",
+    "record_id": "import_103"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:20",
+    "category": "neutral",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.95,
+      "reasons": "在连续的三帧图像中，猫处于静止状态，身体放松地躺在地面上。由于画面清晰度有限且猫的动作不明显，无法判断其具体行为，因此归类为无特定行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540687",
+    "record_id": "import_104"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:26",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无宠物",
+      "confidence": 0.95,
+      "reasons": "在提供的三帧图像中，未检测到任何猫的存在。画面显示的是一个室内环境，包括沙发、地板和家具，但没有观察到猫的任何身体部分或活动迹象。"
+    },
+    "import_time": "2025-10-15T20:07:31.540688",
+    "record_id": "import_105"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:31",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.9,
+      "reasons": "在连续的三帧图像中，未检测到猫的存在。画面主要显示室内环境和一名人员，但没有猫的明显动作或形态特征。"
+    },
+    "import_time": "2025-10-15T20:07:31.540690",
+    "record_id": "import_106"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:38",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.9,
+      "reasons": "在提供的图像序列中，未检测到猫的存在。画面主要显示一名女性在使用笔记本电脑，周围有办公用品和设备，但没有猫的踪迹。因此，无法判断猫的行为，归类为无特定行为。"
+    },
+    "import_time": "2025-10-15T20:07:31.540692",
+    "record_id": "import_107"
+  },
+  {
+    "timestamp": "2025-10-13 20:26:42",
+    "category": "no_pet",
+    "confidence": 0.5,
+    "reasons": {
+      "category": "无特定行为",
+      "confidence": 0.95,
+      "reasons": "在连续的三帧图像中，未检测到猫的存在。画面主要显示一名女性在使用笔记本电脑，周围环境为室内办公区域，光线充足，但没有猫的任何动作或形态出现。"
+    },
+    "import_time": "2025-10-15T20:07:31.540693",
+    "record_id": "import_108"
+  }
+]

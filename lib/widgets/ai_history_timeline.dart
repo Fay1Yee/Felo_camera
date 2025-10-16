@@ -5,6 +5,7 @@ import '../config/nothing_theme.dart';
 import '../models/analysis_history.dart';
 import '../screens/data_management/life_records_screen.dart';
 import '../services/behavior_analyzer.dart';
+import '../services/behavior_classification_service.dart';
 import '../services/history_manager.dart';
 import '../services/data_association_service.dart';
 import '../services/history_notifier.dart';
@@ -444,21 +445,8 @@ class _AIHistoryTimelineState extends State<AIHistoryTimeline> {
   }
 
   RecordType _getRecordTypeFromTags(List<String> tags, String mode) {
-    if (tags.contains('进食')) return RecordType.feeding;
-    if (tags.contains('玩耍')) return RecordType.play;
-    if (tags.contains('休息')) return RecordType.sleep;
-    if (tags.contains('运动')) return RecordType.exercise;
-    if (tags.contains('清洁')) return RecordType.grooming;
-    if (tags.contains('健康检查')) return RecordType.health;
-    if (tags.contains('社交')) return RecordType.social;
-    
-    // 基于模式的默认类型
-    switch (mode) {
-      case 'health': return RecordType.health;
-      case 'pet': return RecordType.play;
-      case 'travel': return RecordType.exercise;
-      default: return RecordType.other;
-    }
+    // 使用行为分类服务来获取记录类型
+    return BehaviorClassificationService.instance.getRecordTypeFromTags(tags, mode);
   }
 
   Color _getConfidenceColor(int confidence) {
